@@ -10,7 +10,7 @@ DOCS = os.path.join(HERE, "docs")
 # Public display names. Anyone not listed is shown by first name.
 NAMES = {
     "Thomas Moeller": "Moeller",
-    "Thomas Dalimonte": "Dalimonte",
+    "Thomas Dalimonte": "T-Dal",
     "Adam Weber": "Weber",
     "Brendan Mokler": "Mokler",
 }
