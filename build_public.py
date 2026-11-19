@@ -11,6 +11,7 @@ DOCS = os.path.join(HERE, "docs")
 NAMES = {
     "Thomas Moeller": "Moeller",
     "Thomas Dalimonte": "T-Dal",
+    "Alex Bensley": "Benz",
     "Adam Weber": "Weber",
     "Brendan Mokler": "Mokler",
 }
