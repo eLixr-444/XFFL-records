@@ -1,0 +1,950 @@
+<meta name="dash-one-writer">
+<style>
+  .rb { display: grid; gap: var(--cds-gap-lg); }
+  .rb-head { display: grid; gap: var(--cds-gap-sm); }
+  .rb-head h1 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; text-wrap: balance; }
+  .rb-sub { margin: 0; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .rb-tabs { display: flex; flex-wrap: wrap; gap: var(--cds-gap-xs); border-bottom: 1px solid var(--color-border-line); padding-bottom: var(--cds-gap-sm); }
+  .rb-tabs a { color: var(--color-fg-muted); text-decoration: none; border: 1px solid transparent; border-radius: 999px; padding: 5px 14px; font-size: var(--cds-font-size-body); }
+  .rb-tabs a:hover, .rb-tabs a:focus-visible { color: var(--color-fg); border-color: var(--color-border-line); }
+  .rb-tabs a.on { color: var(--color-fg); background: var(--color-panel); border-color: var(--color-border-line); font-weight: var(--cds-font-weight-medium); }
+  .rb-page { display: grid; gap: var(--cds-gap-md); }
+  .rb-page > h2 { margin: 0; font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); }
+  .rb-page > p { margin: 0; color: var(--color-fg-muted); max-width: 72ch; }
+  .rb-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: var(--cds-gap-lg); }
+  .rb-card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); min-width: 0; display: grid; gap: var(--cds-gap-sm); align-content: start; }
+  .rb-card h3 { margin: 0; font-size: var(--cds-font-size-body); font-weight: var(--cds-font-weight-medium); }
+  .rb-bar { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm); align-items: center; }
+  .rb-bar label { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .rb-scroll { overflow-x: auto; min-width: 0; }
+  .rb-t { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: var(--cds-font-size-body); }
+  .rb-t th { text-align: left; color: var(--color-fg-muted); font-weight: var(--cds-font-weight-medium); font-size: var(--cds-font-size-caption); text-transform: uppercase; letter-spacing: 0.04em; padding: 6px 8px; border-bottom: 1px solid var(--color-border-line); white-space: nowrap; vertical-align: bottom; }
+  .rb-t td { padding: 6px 8px; border-bottom: 1px solid var(--color-border-line); white-space: nowrap; }
+  .rb-t tr:last-child td { border-bottom: 0; }
+  .rb-t .num { text-align: right; }
+  .rb-t .dim { color: var(--color-fg-muted); }
+  .rb-t td.msg { color: var(--color-fg-muted); white-space: normal; }
+  .rb-t td.sorted { font-weight: var(--cds-font-weight-medium); }
+  .rb-sort { all: unset; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px dashed transparent; }
+  .rb-sort:hover, .rb-sort:focus-visible { color: var(--color-fg); border-bottom-color: var(--color-fg-muted); }
+  .rb-sort:focus-visible { outline: 2px solid var(--color-fg-muted); outline-offset: 2px; }
+  th[aria-sort="descending"] .rb-sort, th[aria-sort="ascending"] .rb-sort { color: var(--color-fg); }
+  th[aria-sort="descending"] .rb-sort::after { content: " ▼"; }
+  th[aria-sort="ascending"] .rb-sort::after { content: " ▲"; }
+  .rb-chip { display: inline-block; font-size: var(--cds-font-size-caption); padding: 1px 8px; border-radius: 999px; border: 1px solid var(--color-border-line); color: var(--color-fg-muted); }
+  .rb-chip.po { color: var(--color-fg); border-color: var(--color-fg-muted); }
+  .rb-chip.ch { color: var(--color-fg); border-color: var(--color-ok); }
+  .rb-pick { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm); align-items: center; }
+  .rb-pick .vs { color: var(--color-fg-muted); }
+  .rb-h2h { display: grid; gap: var(--cds-gap-md); min-width: 0; }
+  .rb-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--cds-gap-md); }
+  .rb-tile { display: grid; gap: 2px; }
+  .rb-tile .k { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .rb-tile .v { font-family: var(--font-anthropic-serif); font-size: var(--cds-font-size-title); font-variant-numeric: tabular-nums; }
+  .rb-subhead { margin: var(--cds-gap-md) 0 0; font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); }
+  .rb-facts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: var(--cds-gap-md); }
+  .rb-facts li { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-md) var(--cds-pad-lg); display: grid; gap: 4px; align-content: start; }
+  .rb-facts .cat { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); text-transform: uppercase; letter-spacing: 0.05em; }
+  .rb-facts .txt { line-height: 1.45; }
+  .rb-facts .top { display: flex; flex-wrap: wrap; gap: var(--cds-gap-xs); align-items: center; justify-content: space-between; }
+  .rb-chip.rec { color: var(--color-fg); border-color: var(--color-ok); }
+  .rb-empty { color: var(--color-fg-muted); }
+  .rb-btn { font: inherit; color: var(--color-fg); background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: 6px 14px; cursor: pointer; }
+  .rb-btn:hover { border-color: var(--color-fg-muted); }
+  .rb-btn:focus-visible { outline: 2px solid var(--color-fg-muted); outline-offset: 2px; }
+  .rb-chart { position: relative; min-height: 280px; }
+  .rb-chart svg text { fill: var(--cds-text-secondary); font-size: var(--cds-font-size-caption); }
+  .rb-tip { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); box-shadow: var(--cds-shadow-popover); border-radius: var(--cds-radius); padding: 6px 10px; font-size: var(--cds-font-size-caption); white-space: nowrap; }
+  .rb-notes summary { cursor: pointer; color: var(--color-fg-muted); }
+  .rb-notes ul { margin: var(--cds-gap-sm) 0 0; padding-left: 20px; color: var(--color-fg-muted); max-width: 72ch; display: grid; gap: 4px; }
+  @media print {
+    .rb-tabs, .rb-bar, .rb-btn { display: none; }
+    .rb-page + .rb-page { break-before: page; }
+  }
+</style>
+
+<div class="rb">
+  <header class="rb-head" id="top">
+    <h1>The XFFL Record Book Bible</h1>
+    <p class="rb-sub">Every XFFL season since 2020. <span data-draw="asOf">—</span> It's Wentz's year.</p>
+    <nav class="rb-tabs" aria-label="Pages">
+      <a href="#standings" data-page="standings">All-time standings</a>
+      <a href="#champions" data-page="champions">Champions</a>
+      <a href="#games" data-page="games">Single-game records</a>
+      <a href="#seasons" data-page="seasons">Season records</a>
+      <a href="#h2h" data-page="h2h">Head-to-head</a>
+      <a href="#facts" data-page="facts">Miscellaneous</a>
+      <a href="#recent" data-page="recent">Recent records</a>
+    </nav>
+  </header>
+
+  <section class="rb-page" id="standings">
+    <h2>All-time standings</h2>
+    <p>Regular-season games, with playoff results counted separately. Tap any column heading to re-rank the league. Tap it again to flip the order.</p>
+    <div class="rb-card rb-scroll">
+      <table class="rb-t" id="alltime-table" data-source="alltime" data-row-key="manager">
+        <thead><tr>
+          <th>#</th>
+          <th data-field="manager">Manager</th>
+          <th class="num" data-field="seasons"><button type="button" class="rb-sort" data-sort="seasons">Seasons</button></th>
+          <th><button type="button" class="rb-sort" data-sort="wins">Record</button></th>
+          <th class="num" data-field="win_pct"><button type="button" class="rb-sort" data-sort="win_pct">Win %</button></th>
+          <th class="num" data-field="points_for"><button type="button" class="rb-sort" data-sort="points_for">Points for</button></th>
+          <th class="num" data-field="points_against"><button type="button" class="rb-sort" data-sort="points_against">Points against</button></th>
+          <th class="num" data-field="ten_win"><button type="button" class="rb-sort" data-sort="ten_win">10+ win seasons</button></th>
+          <th class="num" data-field="win_streak"><button type="button" class="rb-sort" data-sort="win_streak">Win streak</button></th>
+          <th class="num" data-field="loss_streak"><button type="button" class="rb-sort" data-sort="loss_streak">Losing streak</button></th>
+          <th class="num" data-field="playoff_apps"><button type="button" class="rb-sort" data-sort="playoff_apps">Playoffs</button></th>
+          <th><button type="button" class="rb-sort" data-sort="playoff_wins">Playoff record</button></th>
+          <th class="num" data-field="finals"><button type="button" class="rb-sort" data-sort="finals">Finals</button></th>
+          <th class="num" data-field="titles"><button type="button" class="rb-sort" data-sort="titles">Titles</button></th>
+        </tr></thead>
+        <tbody data-draw="alltime"></tbody>
+      </table>
+    </div>
+    <details class="rb-notes" id="notes">
+      <summary>How these records are counted</summary>
+      <ul>
+        <li>Managers are tracked by their ESPN account, so records follow a person through team name changes.</li>
+        <li>Standings, averages, streaks, luck and bench points use regular-season games only. Ties count as half a win and end a streak.</li>
+        <li>Streaks carry over from one season into the next.</li>
+        <li>Playoff games are winners-bracket games between playoff seeds, including third- and fifth-place games. Consolation games are not counted.</li>
+        <li>Acquisitions are players added from waivers or free agency. Add/drops are adds plus drops. Trades count each trade a team made.</li>
+        <li>2020 had a 4-team playoff. Every season since has had 6.</li>
+        <li>The data is a snapshot downloaded from ESPN. It updates only when it is downloaded again.</li>
+      </ul>
+    </details>
+  </section>
+
+  <section class="rb-page" id="champions" hidden>
+    <h2>Champions</h2>
+    <div class="rb-card rb-scroll">
+      <table class="rb-t" data-source="champions" data-row-key="season">
+        <thead><tr>
+          <th data-field="season">Season</th><th data-field="champion">Champion</th><th data-field="champion_team">Team</th><th data-field="champion_record">Record</th>
+          <th data-field="runner_up">Runner-up</th><th data-field="third_place">Third</th><th data-field="top_seed">No. 1 seed</th>
+          <th data-field="most_points">Most points</th><th class="num" data-field="most_points_total">Points</th>
+        </tr></thead>
+        <tbody data-draw="champions"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="rb-page" id="games" hidden>
+    <h2>Single-game records</h2>
+    <p>Regular-season and playoff records are kept apart. Consolation games are left out.</p>
+    <div class="rb-grid">
+      <div class="rb-card" id="high-reg">
+        <h3>Highest scores · Regular season</h3>
+        <div class="rb-scroll"><table class="rb-t" data-source="highReg" data-row-key="id">
+          <thead><tr><th>#</th><th data-field="manager">Manager</th><th class="num" data-field="score">Score</th><th data-field="opponent">Opponent</th><th>When</th></tr></thead>
+          <tbody data-draw="highReg"></tbody>
+        </table></div>
+      </div>
+      <div class="rb-card" id="low-reg">
+        <h3>Lowest scores · Regular season</h3>
+        <div class="rb-scroll"><table class="rb-t" data-source="lowReg" data-row-key="id">
+          <thead><tr><th>#</th><th data-field="manager">Manager</th><th class="num" data-field="score">Score</th><th data-field="opponent">Opponent</th><th>When</th></tr></thead>
+          <tbody data-draw="lowReg"></tbody>
+        </table></div>
+      </div>
+      <div class="rb-card" id="high-po">
+        <h3>Highest scores · Playoffs</h3>
+        <div class="rb-scroll"><table class="rb-t" data-source="highPO" data-row-key="id">
+          <thead><tr><th>#</th><th data-field="manager">Manager</th><th class="num" data-field="score">Score</th><th data-field="opponent">Opponent</th><th>When</th></tr></thead>
+          <tbody data-draw="highPO"></tbody>
+        </table></div>
+      </div>
+      <div class="rb-card" id="low-po">
+        <h3>Lowest scores · Playoffs</h3>
+        <div class="rb-scroll"><table class="rb-t" data-source="lowPO" data-row-key="id">
+          <thead><tr><th>#</th><th data-field="manager">Manager</th><th class="num" data-field="score">Score</th><th data-field="opponent">Opponent</th><th>When</th></tr></thead>
+          <tbody data-draw="lowPO"></tbody>
+        </table></div>
+      </div>
+      <div class="rb-card" id="blowouts">
+        <h3>Biggest blowouts</h3>
+        <div class="rb-scroll"><table class="rb-t" data-source="blowouts" data-row-key="id">
+          <thead><tr><th>#</th><th data-field="winner">Winner</th><th data-field="loser">Loser</th><th>Score</th><th class="num" data-field="margin">Margin</th><th>When</th></tr></thead>
+          <tbody data-draw="blowouts"></tbody>
+        </table></div>
+      </div>
+      <div class="rb-card" id="closest">
+        <h3>Closest games</h3>
+        <div class="rb-scroll"><table class="rb-t" data-source="closest" data-row-key="id">
+          <thead><tr><th>#</th><th data-field="winner">Winner</th><th data-field="loser">Loser</th><th>Score</th><th class="num" data-field="margin">Margin</th><th>When</th></tr></thead>
+          <tbody data-draw="closest"></tbody>
+        </table></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="rb-page" id="seasons" hidden>
+    <h2>Season records</h2>
+    <p>Completed seasons only, so 2026 joins these lists once it ends. Points and averages are regular season.</p>
+    <div class="rb-grid">
+      <div class="rb-card" id="season-points">
+        <h3>Most points in a season</h3>
+        <div class="rb-scroll"><table class="rb-t" data-source="seasonPoints" data-row-key="id">
+          <thead><tr><th>#</th><th data-field="manager">Manager</th><th data-field="season">Season</th><th class="num" data-field="value">Points</th><th>Record</th><th data-field="finish_label">Finish</th></tr></thead>
+          <tbody data-draw="seasonPoints"></tbody>
+        </table></div>
+      </div>
+      <div class="rb-card" id="season-low-points">
+        <h3>Fewest points in a season</h3>
+        <div class="rb-scroll"><table class="rb-t" data-source="seasonLowPoints" data-row-key="id">
+          <thead><tr><th>#</th><th data-field="manager">Manager</th><th data-field="season">Season</th><th class="num" data-field="value">Points</th><th>Record</th><th data-field="finish_label">Finish</th></tr></thead>
+          <tbody data-draw="seasonLowPoints"></tbody>
+        </table></div>
+      </div>
+      <div class="rb-card" id="season-high-avg">
+        <h3>Highest avg. score · Regular season</h3>
+        <div class="rb-scroll"><table class="rb-t" data-source="seasonHighAvg" data-row-key="id">
+          <thead><tr><th>#</th><th data-field="manager">Manager</th><th data-field="season">Season</th><th class="num" data-field="value">Avg.</th><th>Record</th><th data-field="finish_label">Finish</th></tr></thead>
+          <tbody data-draw="seasonHighAvg"></tbody>
+        </table></div>
+      </div>
+      <div class="rb-card" id="season-low-avg">
+        <h3>Lowest avg. score · Regular season</h3>
+        <div class="rb-scroll"><table class="rb-t" data-source="seasonLowAvg" data-row-key="id">
+          <thead><tr><th>#</th><th data-field="manager">Manager</th><th data-field="season">Season</th><th class="num" data-field="value">Avg.</th><th>Record</th><th data-field="finish_label">Finish</th></tr></thead>
+          <tbody data-draw="seasonLowAvg"></tbody>
+        </table></div>
+      </div>
+      <div class="rb-card" id="season-records">
+        <h3>Best regular-season records</h3>
+        <div class="rb-scroll"><table class="rb-t" data-source="seasonRecords" data-row-key="id">
+          <thead><tr><th>#</th><th data-field="manager">Manager</th><th data-field="season">Season</th><th>Record</th><th class="num" data-field="points_for">Points</th><th data-field="finish_label">Finish</th></tr></thead>
+          <tbody data-draw="seasonRecords"></tbody>
+        </table></div>
+      </div>
+      <div class="rb-card" id="season-trades">
+        <h3>Most trades in a season</h3>
+        <div class="rb-scroll"><table class="rb-t" data-source="seasonTrades" data-row-key="id">
+          <thead><tr><th>#</th><th data-field="manager">Manager</th><th data-field="season">Season</th><th class="num" data-field="value">Trades</th><th>Record</th><th data-field="finish_label">Finish</th></tr></thead>
+          <tbody data-draw="seasonTrades"></tbody>
+        </table></div>
+      </div>
+      <div class="rb-card" id="season-adddrops">
+        <h3>Most add/drops in a season</h3>
+        <div class="rb-scroll"><table class="rb-t" data-source="seasonAddDrops" data-row-key="id">
+          <thead><tr><th>#</th><th data-field="manager">Manager</th><th data-field="season">Season</th><th class="num" data-field="value">Add/drops</th><th>Record</th><th data-field="finish_label">Finish</th></tr></thead>
+          <tbody data-draw="seasonAddDrops"></tbody>
+        </table></div>
+      </div>
+      <div class="rb-card" id="season-acq">
+        <h3>Most acquisitions in a season</h3>
+        <div class="rb-scroll"><table class="rb-t" data-source="seasonAcq" data-row-key="id">
+          <thead><tr><th>#</th><th data-field="manager">Manager</th><th data-field="season">Season</th><th class="num" data-field="value">Acquisitions</th><th>Record</th><th data-field="finish_label">Finish</th></tr></thead>
+          <tbody data-draw="seasonAcq"></tbody>
+        </table></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="rb-page" id="h2h" hidden>
+    <h2>Head-to-head</h2>
+    <p>Pick two managers to see every game they have played against each other, playoffs included.</p>
+    <div class="rb-card">
+      <div class="rb-pick">
+        <select class="dash-select" id="h2h-a" aria-label="First manager" data-draw="h2hA" data-source="alltime"></select>
+        <span class="vs">vs</span>
+        <select class="dash-select" id="h2h-b" aria-label="Second manager" data-draw="h2hB" data-source="alltime"></select>
+      </div>
+      <div class="rb-h2h" data-draw="h2hResult"></div>
+    </div>
+  </section>
+
+  <section class="rb-page" id="facts" hidden>
+    <h2>Miscellaneous</h2>
+    <p>Luck, bench points and fun facts from every game and season in the record book.</p>
+    <div class="rb-grid">
+      <div class="rb-card" id="luck-chart">
+        <h3>Luck: all-time wins above or below expected</h3>
+        <p class="rb-sub">Expected wins count how many teams you outscored each week, as if you played everyone.</p>
+        <div class="rb-chart" data-draw="luckChart" data-source="luck"></div>
+      </div>
+      <div class="rb-card" id="luck-seasons">
+        <h3>Luckiest and unluckiest seasons</h3>
+        <div class="rb-scroll"><table class="rb-t" data-source="luckSeasons" data-row-key="id">
+          <thead><tr><th data-field="manager">Manager</th><th data-field="season">Season</th><th class="num" data-field="wins">Wins</th><th class="num" data-field="expected_wins">Expected</th><th class="num" data-field="luck">Luck</th></tr></thead>
+          <tbody data-draw="luckSeasons"></tbody>
+        </table></div>
+      </div>
+      <div class="rb-card" id="bench-total">
+        <h3>Points left on the bench</h3>
+        <div class="rb-scroll"><table class="rb-t" data-source="benchAll" data-row-key="manager">
+          <thead><tr><th>#</th><th data-field="manager">Manager</th><th class="num" data-field="bench_points">Total</th><th class="num" data-field="games">Games</th><th class="num" data-field="per_game">Per game</th></tr></thead>
+          <tbody data-draw="benchAll"></tbody>
+        </table></div>
+      </div>
+      <div class="rb-card" id="bench-weeks">
+        <h3>Biggest bench weeks</h3>
+        <div class="rb-scroll"><table class="rb-t" data-source="benchWeeks" data-row-key="id">
+          <thead><tr><th>#</th><th data-field="manager">Manager</th><th class="num" data-field="bench">Bench</th><th class="num" data-field="started">Started</th><th data-field="result">Result</th><th>When</th></tr></thead>
+          <tbody data-draw="benchWeeks"></tbody>
+        </table></div>
+      </div>
+    </div>
+    <h3 class="rb-subhead" id="fun-facts">Fun facts</h3>
+    <p class="rb-sub">Press the button for a different set.</p>
+    <div class="rb-bar">
+      <button type="button" class="rb-btn" id="facts-shuffle">Show me different facts</button>
+      <span class="rb-sub" data-draw="factCount">—</span>
+    </div>
+    <ul class="rb-facts" id="fact-list" data-draw="facts" data-source="funFacts"></ul>
+  </section>
+  <section class="rb-page" id="recent" hidden>
+    <h2>Recent records</h2>
+    <p>Records set or matched in the latest week of games. This page starts over each time new games are added.</p>
+    <h3 class="rb-subhead" id="recent-week" data-draw="recentWeek">—</h3>
+    <ul class="rb-facts" id="recent-list" data-draw="recent" data-source="recentRecords"></ul>
+  </section>
+</div>
+
+<script>
+  // ---------- Calculations ----------
+  const finishLabel = (f) => { const n = +f; if (!n) return ''; return n === 1 ? 'Champion' : n === 2 ? 'Runner-up' : n === 3 ? '3rd' : n + 'th'; };
+
+  dash.calc('teamGames', {
+    title: 'Team scores by game', description: 'Each game split into one row per team, with the opponent and result.',
+    inputs: ['games'],
+    fn: (games) => {
+      const out = [];
+      for (const g of games) {
+        const hs = +g.home_score, as = +g.away_score;
+        out.push({ id: g.id + '-h', game: g.id, season: +g.season, week: +g.week, kind: g.kind, manager: g.home, team: g.home_team, score: hs, opponent: g.away, opp_score: as, bench: g.home_bench == null ? null : +g.home_bench, result: hs > as ? 'Won' : hs < as ? 'Lost' : 'Tied' });
+        out.push({ id: g.id + '-a', game: g.id, season: +g.season, week: +g.week, kind: g.kind, manager: g.away, team: g.away_team, score: as, opponent: g.home, opp_score: hs, bench: g.away_bench == null ? null : +g.away_bench, result: as > hs ? 'Won' : as < hs ? 'Lost' : 'Tied' });
+      }
+      return out;
+    },
+  });
+
+  dash.calc('streaks', {
+    title: 'Win and losing streaks', description: 'Longest and current regular-season streaks per manager, carried across seasons. Ties end a streak.',
+    inputs: ['teamGames'],
+    fn: (teamGames) => {
+      const by = new Map();
+      teamGames.filter((r) => r.kind === 'Regular season').sort((a, b) => a.season - b.season || a.week - b.week).forEach((r) => {
+        const m = by.get(r.manager) || { manager: r.manager, win_streak: 0, loss_streak: 0, cur_type: null, cur_len: 0, win_end: '', loss_end: '' };
+        if (r.result === 'Tied') { m.cur_type = null; m.cur_len = 0; }
+        else {
+          if (m.cur_type === r.result) m.cur_len++; else { m.cur_type = r.result; m.cur_len = 1; }
+          if (r.result === 'Won' && m.cur_len > m.win_streak) { m.win_streak = m.cur_len; m.win_end = r.season + ' Wk ' + r.week; }
+          if (r.result === 'Lost' && m.cur_len > m.loss_streak) { m.loss_streak = m.cur_len; m.loss_end = r.season + ' Wk ' + r.week; }
+        }
+        by.set(r.manager, m);
+      });
+      return [...by.values()].map((m) => ({
+        manager: m.manager, win_streak: m.win_streak, win_streak_ended: m.win_end, loss_streak: m.loss_streak, loss_streak_ended: m.loss_end,
+        current: m.cur_type ? (m.cur_type === 'Won' ? 'W' : 'L') + m.cur_len : '—', current_len: m.cur_len, current_type: m.cur_type,
+      }));
+    },
+  });
+
+  dash.calc('alltime', {
+    title: 'All-time standings', description: 'Regular-season record, points, streaks and playoff results per manager, plus transaction totals used by the fun facts.',
+    inputs: ['seasons', 'games', 'streaks'],
+    fn: (seasons, games, streaks) => {
+      const by = new Map();
+      for (const s of seasons) {
+        const m = by.get(s.manager) || { manager: s.manager, seasons: 0, wins: 0, losses: 0, ties: 0, points_for: 0, points_against: 0, playoff_apps: 0, titles: 0, finals: 0, po_w: 0, po_l: 0, ten_win: 0, trades: 0, acquisitions: 0, add_drops: 0 };
+        m.seasons += 1; m.wins += +s.wins; m.losses += +s.losses; m.ties += +s.ties;
+        m.points_for += +s.points_for; m.points_against += +s.points_against;
+        if (s.made_playoffs === true || s.made_playoffs === 'true') m.playoff_apps += 1;
+        if (+s.finish === 1) m.titles += 1;
+        if (+s.finish === 1 || +s.finish === 2) m.finals += 1;
+        if (+s.wins >= 10) m.ten_win += 1;
+        m.trades += +s.trades || 0; m.acquisitions += +s.acquisitions || 0; m.add_drops += +s.add_drops || 0;
+        by.set(s.manager, m);
+      }
+      for (const g of games) {
+        if (g.kind === 'Regular season') continue;
+        const hs = +g.home_score, as = +g.away_score, h = by.get(g.home), a = by.get(g.away);
+        if (hs > as) { h.po_w++; a.po_l++; } else if (as > hs) { a.po_w++; h.po_l++; }
+      }
+      const st = new Map(streaks.map((s) => [s.manager, s]));
+      return [...by.values()].map((m) => {
+        const gp = m.wins + m.losses + m.ties, s = st.get(m.manager) || {};
+        return {
+          manager: m.manager, seasons: m.seasons, wins: m.wins, losses: m.losses, ties: m.ties,
+          record: m.wins + '-' + m.losses + (m.ties ? '-' + m.ties : ''),
+          win_pct: Math.round(((m.wins + m.ties / 2) / gp) * 1000) / 10,
+          points_for: Math.round(m.points_for * 100) / 100, points_against: Math.round(m.points_against * 100) / 100,
+          avg_score: Math.round((m.points_for / gp) * 100) / 100,
+          ten_win: m.ten_win, win_streak: s.win_streak || 0, loss_streak: s.loss_streak || 0,
+          playoff_apps: m.playoff_apps, playoff_wins: m.po_w, playoff_record: m.po_w + '-' + m.po_l, finals: m.finals, titles: m.titles,
+          trades: m.trades, acquisitions: m.acquisitions, add_drops: m.add_drops,
+        };
+      }).sort((a, b) => b.win_pct - a.win_pct || b.points_for - a.points_for);
+    },
+  });
+
+  const topN = (rows, key, dir, n) => rows.slice().sort((a, b) => (dir === 'desc' ? b[key] - a[key] : a[key] - b[key])).slice(0, n || 10).map((r, i) => ({ ...r, rank: i + 1 }));
+  window.rbTopN = topN;
+
+  dash.calc('highReg', { title: 'Highest scores, regular season', description: 'The ten highest team scores in a regular-season game.', inputs: ['teamGames'],
+    fn: (teamGames) => teamGames.filter((r) => r.kind === 'Regular season').sort((a, b) => b.score - a.score).slice(0, 10).map((r, i) => ({ ...r, rank: i + 1 })) });
+  dash.calc('lowReg', { title: 'Lowest scores, regular season', description: 'The ten lowest team scores in a regular-season game.', inputs: ['teamGames'],
+    fn: (teamGames) => teamGames.filter((r) => r.kind === 'Regular season').sort((a, b) => a.score - b.score).slice(0, 10).map((r, i) => ({ ...r, rank: i + 1 })) });
+  dash.calc('highPO', { title: 'Highest scores, playoffs', description: 'The ten highest team scores in a playoff game.', inputs: ['teamGames'],
+    fn: (teamGames) => teamGames.filter((r) => r.kind !== 'Regular season').sort((a, b) => b.score - a.score).slice(0, 10).map((r, i) => ({ ...r, rank: i + 1 })) });
+  dash.calc('lowPO', { title: 'Lowest scores, playoffs', description: 'The ten lowest team scores in a playoff game.', inputs: ['teamGames'],
+    fn: (teamGames) => teamGames.filter((r) => r.kind !== 'Regular season').sort((a, b) => a.score - b.score).slice(0, 10).map((r, i) => ({ ...r, rank: i + 1 })) });
+
+  dash.calc('gameMargins', {
+    title: 'Game margins', description: 'Winner, loser and margin of victory for every game.', inputs: ['games'],
+    fn: (games) => games.map((g) => {
+      const hs = +g.home_score, as = +g.away_score, homeWon = hs >= as;
+      return { id: g.id, season: +g.season, week: +g.week, kind: g.kind,
+        winner: homeWon ? g.home : g.away, winner_score: homeWon ? hs : as, loser: homeWon ? g.away : g.home, loser_score: homeWon ? as : hs,
+        margin: Math.round(Math.abs(hs - as) * 100) / 100, tie: hs === as };
+    }),
+  });
+  dash.calc('blowouts', { title: 'Biggest blowouts', description: 'The ten largest margins of victory.', inputs: ['gameMargins'],
+    fn: (gameMargins) => gameMargins.slice().sort((a, b) => b.margin - a.margin).slice(0, 10).map((r, i) => ({ ...r, rank: i + 1 })) });
+  dash.calc('closest', { title: 'Closest games', description: 'The ten smallest margins, ties included.', inputs: ['gameMargins'],
+    fn: (gameMargins) => gameMargins.slice().sort((a, b) => a.margin - b.margin).slice(0, 10).map((r, i) => ({ ...r, rank: i + 1 })) });
+
+  dash.calc('seasonRows', {
+    title: 'Completed seasons', description: 'Each completed manager season with its record and finish, for the season leaderboards.', inputs: ['seasons'],
+    fn: (seasons) => seasons.filter((s) => s.status === 'Complete').map((s) => ({
+      id: s.id, manager: s.manager, season: +s.season, wins: +s.wins, losses: +s.losses, ties: +s.ties,
+      record: s.wins + '-' + s.losses + (+s.ties ? '-' + s.ties : ''), points_for: +s.points_for, avg_score: +s.avg_score,
+      win_pct: (+s.wins + s.ties / 2) / (+s.wins + +s.losses + +s.ties), trades: +s.trades, add_drops: +s.add_drops, acquisitions: +s.acquisitions,
+      finish_label: (() => { const n = +s.finish; return n === 1 ? 'Champion' : n === 2 ? 'Runner-up' : n === 3 ? '3rd' : n + 'th'; })(),
+    })),
+  });
+  const seasonBoard = (id, title, description, key, dir) => dash.calc(id, { title, description, inputs: ['seasonRows'],
+    fn: (seasonRows) => seasonRows.slice()
+      .sort((a, b) => (dir === 'desc' ? b[key] - a[key] : a[key] - b[key]) || b.points_for - a.points_for)
+      .slice(0, 10).map((r, i) => ({ ...r, rank: i + 1, value: r[key] })) });
+  seasonBoard('seasonPoints', 'Most points in a season', 'The ten highest regular-season point totals.', 'points_for', 'desc');
+  seasonBoard('seasonLowPoints', 'Fewest points in a season', 'The ten lowest regular-season point totals.', 'points_for', 'asc');
+  seasonBoard('seasonHighAvg', 'Highest average score in a season', 'The ten highest regular-season points per game.', 'avg_score', 'desc');
+  seasonBoard('seasonLowAvg', 'Lowest average score in a season', 'The ten lowest regular-season points per game.', 'avg_score', 'asc');
+  seasonBoard('seasonRecords', 'Best regular-season records', 'The ten best win percentages, ties broken by points.', 'win_pct', 'desc');
+  seasonBoard('seasonTrades', 'Most trades in a season', 'The ten highest trade counts in one season.', 'trades', 'desc');
+  seasonBoard('seasonAddDrops', 'Most add/drops in a season', 'The ten highest adds plus drops in one season.', 'add_drops', 'desc');
+  seasonBoard('seasonAcq', 'Most acquisitions in a season', 'The ten most players added from waivers or free agency in one season.', 'acquisitions', 'desc');
+
+  dash.calc('h2h', {
+    title: 'Head-to-head records', description: 'Wins, losses and points for every pair of managers, playoffs included.', inputs: ['games'],
+    fn: (games) => {
+      const by = new Map();
+      const add = (a, b, as, bs, kind) => {
+        const id = a + '|' + b;
+        const r = by.get(id) || { id, a, b, games: 0, a_wins: 0, b_wins: 0, ties: 0, a_points: 0, b_points: 0, playoff_games: 0 };
+        r.games++; r.a_points += as; r.b_points += bs;
+        if (as > bs) r.a_wins++; else if (bs > as) r.b_wins++; else r.ties++;
+        if (kind !== 'Regular season') r.playoff_games++;
+        by.set(id, r);
+      };
+      for (const g of games) { const hs = +g.home_score, as = +g.away_score; add(g.home, g.away, hs, as, g.kind); add(g.away, g.home, as, hs, g.kind); }
+      return [...by.values()].map((r) => ({ ...r, a_points: Math.round(r.a_points * 100) / 100, b_points: Math.round(r.b_points * 100) / 100,
+        a_avg: Math.round((r.a_points / r.games) * 100) / 100, b_avg: Math.round((r.b_points / r.games) * 100) / 100 }));
+    },
+  });
+
+  dash.calc('luck', {
+    title: 'All-time luck', description: 'Regular-season wins compared with expected wins from playing every team each week.', inputs: ['seasons'],
+    fn: (seasons) => {
+      const by = new Map();
+      for (const s of seasons) { const m = by.get(s.manager) || { manager: s.manager, wins: 0, expected_wins: 0 }; m.wins += +s.wins + s.ties / 2; m.expected_wins += +s.expected_wins; by.set(s.manager, m); }
+      return [...by.values()].map((m) => ({ manager: m.manager, wins: m.wins, expected_wins: Math.round(m.expected_wins * 100) / 100, luck: Math.round((m.wins - m.expected_wins) * 100) / 100 })).sort((a, b) => b.luck - a.luck);
+    },
+  });
+  dash.calc('luckSeasons', {
+    title: 'Luckiest and unluckiest seasons', description: 'The five completed seasons most above and most below expected wins.', inputs: ['seasons'],
+    fn: (seasons) => {
+      const rows = seasons.filter((s) => s.status === 'Complete').map((s) => ({ id: s.id, manager: s.manager, season: +s.season, wins: +s.wins + s.ties / 2, expected_wins: +s.expected_wins,
+        luck: Math.round((+s.wins + s.ties / 2 - s.expected_wins) * 100) / 100 })).sort((a, b) => b.luck - a.luck);
+      return [...rows.slice(0, 5), ...rows.slice(-5)];
+    },
+  });
+  dash.calc('benchAll', {
+    title: 'Bench points by manager', description: 'Points scored by bench players in regular-season games.', inputs: ['teamGames'],
+    fn: (teamGames) => {
+      const by = new Map();
+      for (const r of teamGames) { if (r.bench == null) continue; const m = by.get(r.manager) || { manager: r.manager, bench_points: 0, games: 0 }; m.bench_points += r.bench; m.games++; by.set(r.manager, m); }
+      return [...by.values()].map((m) => ({ manager: m.manager, bench_points: Math.round(m.bench_points * 100) / 100, games: m.games, per_game: Math.round((m.bench_points / m.games) * 100) / 100 }))
+        .sort((a, b) => b.per_game - a.per_game).map((r, i) => ({ ...r, rank: i + 1 }));
+    },
+  });
+  dash.calc('benchWeeks', {
+    title: 'Biggest bench weeks', description: 'The ten highest bench totals in a single regular-season game.', inputs: ['teamGames'],
+    fn: (teamGames) => teamGames.filter((r) => r.bench != null).sort((a, b) => b.bench - a.bench).slice(0, 10)
+      .map((r, i) => ({ id: r.id, rank: i + 1, manager: r.manager, bench: r.bench, started: r.score, result: r.result, season: r.season, week: r.week })),
+  });
+
+  dash.calc('funFacts', {
+    title: 'Fun facts', description: 'Facts worked out from every game and season: extremes, streaks, rivalries and oddities.',
+    inputs: ['teamGames', 'seasons', 'champions', 'alltime', 'h2h', 'streaks'],
+    fn: (teamGames, seasons, champions, alltime, h2h, streaks) => {
+      const f = [], p = (n) => n.toFixed(2), add = (id, category, fact) => f.push({ id, category, fact });
+      const when = (r) => r.season + ' Week ' + r.week;
+      const reg = teamGames.filter((r) => r.kind === 'Regular season');
+      const losses = teamGames.filter((r) => r.result === 'Lost').sort((a, b) => b.score - a.score);
+      if (losses[0]) add('best-loss', 'Heartbreak', `${losses[0].manager} scored ${p(losses[0].score)} in ${when(losses[0])} and still lost to ${losses[0].opponent} (${p(losses[0].opp_score)}).`);
+      const wins = teamGames.filter((r) => r.result === 'Won').sort((a, b) => a.score - b.score);
+      if (wins[0]) add('worst-win', 'Ugly wins', `${wins[0].manager} won with just ${p(wins[0].score)} points in ${when(wins[0])}, beating ${wins[0].opponent} (${p(wins[0].opp_score)}).`);
+      const count = (rows, test) => { const m = new Map(); rows.forEach((r) => { if (test(r)) m.set(r.manager, (m.get(r.manager) || 0) + 1); }); return [...m.entries()].sort((a, b) => b[1] - a[1]); };
+      const c150 = count(teamGames, (r) => r.score >= 150);
+      if (c150[0]) add('150-club', 'Big games', `${c150[0][0]} has hit 150+ points ${c150[0][1]} times, the most in the league. The league has ${d3.sum(c150, (d) => d[1])} such games in all.`);
+      const c70 = count(teamGames, (r) => r.score < 70);
+      if (c70[0]) add('sub-70', 'Duds', `${c70[0][0]} has been held under 70 points ${c70[0][1]} times, more than anyone else.`);
+      const weeks = d3.groups(reg, (r) => r.season + '-' + r.week);
+      const top = new Map(), bot = new Map(); let hiWeek = null, loWeek = null;
+      for (const [, rows] of weeks) {
+        const hi = d3.greatest(rows, (r) => r.score), lo = d3.least(rows, (r) => r.score), tot = d3.sum(rows, (r) => r.score);
+        top.set(hi.manager, (top.get(hi.manager) || 0) + 1); bot.set(lo.manager, (bot.get(lo.manager) || 0) + 1);
+        if (!hiWeek || tot > hiWeek.tot) hiWeek = { tot, r: rows[0], n: rows.length };
+        if (!loWeek || tot < loWeek.tot) loWeek = { tot, r: rows[0], n: rows.length };
+      }
+      const tops = [...top.entries()].sort((a, b) => b[1] - a[1]), bots = [...bot.entries()].sort((a, b) => b[1] - a[1]);
+      if (tops[0]) add('weekly-top', 'Top dog', `${tops[0][0]} has been the league's top scorer in ${tops[0][1]} different weeks.`);
+      if (bots[0]) add('weekly-bottom', 'Basement', `${bots[0][0]} has posted the week's lowest score ${bots[0][1]} times.`);
+      if (hiWeek) add('best-week', 'League-wide', `The highest-scoring week in league history was ${when(hiWeek.r)}: ${p(hiWeek.tot)} total points, or ${p(hiWeek.tot / hiWeek.n)} per team.`);
+      if (loWeek) add('worst-week', 'League-wide', `The lowest-scoring week was ${when(loWeek.r)}: just ${p(loWeek.tot / loWeek.n)} points per team.`);
+      const games = d3.groups(teamGames, (r) => r.game).map(([, rs]) => ({ r: rs[0], o: rs[1], tot: rs[0].score + (rs[1] ? rs[1].score : 0) }));
+      const shoot = d3.greatest(games, (g) => g.tot), snooze = d3.least(games, (g) => g.tot);
+      if (shoot) add('shootout', 'Shootouts', `The highest-scoring game ever was ${shoot.r.manager} vs ${shoot.r.opponent} in ${when(shoot.r)}: ${p(shoot.tot)} combined points.`);
+      if (snooze) add('snoozer', 'Snoozers', `The lowest-scoring game ever was ${snooze.r.manager} vs ${snooze.r.opponent} in ${when(snooze.r)}: ${p(snooze.tot)} combined points.`);
+      const comp = seasons.filter((s) => s.status === 'Complete');
+      const champs = comp.filter((s) => +s.finish === 1);
+      const weakChamp = d3.least(champs, (s) => +s.points_for);
+      if (weakChamp) add('weak-champ', 'Champions', `${weakChamp.manager}'s ${weakChamp.season} title team scored only ${p(+weakChamp.points_for)} regular-season points, the fewest of any champion.`);
+      const seedWins = champions.filter((c) => c.champion === c.top_seed).length;
+      add('top-seed', 'Champions', `The No. 1 seed has won the title ${seedWins} of ${champions.length} times.`);
+      const ptsWins = champions.filter((c) => c.champion === c.most_points).length;
+      add('points-title', 'Champions', `The regular-season points leader has won the title ${ptsWins} of ${champions.length} times.`);
+      const runners = d3.rollups(champions, (v) => v.length, (c) => c.runner_up).sort((a, b) => b[1] - a[1]);
+      if (runners[0] && runners[0][1] > 1) add('bridesmaid', 'So close', `${runners[0][0]} has finished runner-up ${runners[0][1]} times.`);
+      const lasts = d3.rollups(comp.filter((s) => +s.finish === d3.max(comp.filter((x) => x.season === s.season), (x) => +x.finish)), (v) => v.length, (s) => s.manager).sort((a, b) => b[1] - a[1]);
+      if (lasts[0]) add('last-place', 'Basement', `${lasts[0][0]} has finished dead last ${lasts[0][1]} time${lasts[0][1] === 1 ? '' : 's'}.`);
+      const rivals = h2h.filter((r) => r.games >= 6 && r.a_wins > r.b_wins).map((r) => ({ ...r, share: r.a_wins / r.games })).sort((a, b) => b.share - a.share);
+      if (rivals[0]) add('owns', 'Rivalries', `${rivals[0].a} owns ${rivals[0].b}: ${rivals[0].a_wins}-${rivals[0].b_wins}${rivals[0].ties ? '-' + rivals[0].ties : ''} all-time.`);
+      const even = h2h.filter((r) => r.games >= 6 && r.a < r.b && r.a_wins === r.b_wins).sort((a, b) => b.games - a.games);
+      if (even[0]) add('dead-even', 'Rivalries', `${even[0].a} and ${even[0].b} are dead even at ${even[0].a_wins}-${even[0].b_wins} after ${even[0].games} meetings.`);
+      const po = alltime.filter((m) => m.playoff_wins + (+m.playoff_record.split('-')[1]) >= 4).map((m) => ({ ...m, pl: +m.playoff_record.split('-')[1] })).sort((a, b) => b.playoff_wins / (b.playoff_wins + b.pl) - a.playoff_wins / (a.playoff_wins + a.pl));
+      if (po[0]) add('clutch', 'Clutch', `${po[0].manager} has the best playoff record in the league at ${po[0].playoff_record}.`);
+      const winless = alltime.filter((m) => m.playoff_wins === 0 && m.playoff_apps > 0);
+      if (winless.length) add('no-po-wins', 'Playoff curse', `${winless.map((m) => m.manager).join(' and ')} ${winless.length === 1 ? 'has' : 'have'} made the playoffs but never won a playoff game.`);
+      const pa = d3.greatest(alltime, (m) => m.points_against / (m.wins + m.losses + m.ties));
+      if (pa) add('tough-sched', 'Bad luck', `${pa.manager} has faced the toughest schedule: opponents average ${p(pa.points_against / (pa.wins + pa.losses + pa.ties))} points against them.`);
+      const names = d3.rollups(seasons, (v) => new Set(v.map((s) => s.team.trim())).size, (s) => s.manager).sort((a, b) => b[1] - a[1]);
+      if (names[0] && names[0][1] > 1) add('names', 'Identity crisis', `${names[0][0]} has gone by ${names[0][1]} different team names.`);
+      const loyal = names.filter((n) => n[1] === 1).map((n) => n[0]);
+      if (loyal.length) add('loyal', 'Identity crisis', `${loyal.join(', ')} ${loyal.length === 1 ? 'has' : 'have'} never changed team names.`);
+      const tr = d3.greatest(alltime, (m) => m.trades), quiet = d3.least(alltime, (m) => m.add_drops / m.seasons);
+      if (tr) add('trader', 'Wheeling and dealing', `${tr.manager} has made ${tr.trades} trades, the most in the league.`);
+      if (quiet) add('set-forget', 'Set it and forget it', `${quiet.manager} makes the fewest moves, about ${Math.round(quiet.add_drops / quiet.seasons)} adds and drops a season.`);
+      const cur = streaks.filter((s) => s.current_len >= 3).sort((a, b) => b.current_len - a.current_len);
+      if (cur[0]) add('hot', cur[0].current_type === 'Won' ? 'On fire' : 'Ice cold', `${cur[0].manager} is on a ${cur[0].current_len}-game ${cur[0].current_type === 'Won' ? 'winning' : 'losing'} streak right now.`);
+      const ws = d3.greatest(streaks, (s) => s.win_streak), ls = d3.greatest(streaks, (s) => s.loss_streak);
+      if (ws) add('streak-w', 'Streaks', `The longest winning streak belongs to ${ws.manager}: ${ws.win_streak} straight wins, ending ${ws.win_streak_ended}.`);
+      if (ls) add('streak-l', 'Streaks', `The longest losing streak belongs to ${ls.manager}: ${ls.loss_streak} straight losses, ending ${ls.loss_streak_ended}.`);
+      const benchLoss = teamGames.filter((r) => r.result === 'Lost' && r.bench != null && r.bench > r.opp_score - r.score).sort((a, b) => b.bench - a.bench);
+      if (benchLoss[0]) add('bench-loss', 'Coaching', `${benchLoss[0].manager} lost by ${p(benchLoss[0].opp_score - benchLoss[0].score)} in ${when(benchLoss[0])} with ${p(benchLoss[0].bench)} points sitting on the bench.`);
+      add('bench-total', 'Coaching', `Across the league, ${p(d3.sum(teamGames, (r) => r.bench || 0))} points have been left on benches in regular-season games.`);
+      const ties = teamGames.filter((r) => r.result === 'Tied' && r.id.endsWith('-h'));
+      if (ties.length) add('ties', 'Oddities', `The league has had ${ties.length} tie${ties.length === 1 ? '' : 's'}, most recently ${ties[ties.length - 1].manager} and ${ties[ties.length - 1].opponent} at ${p(ties[ties.length - 1].score)} in ${when(ties[ties.length - 1])}.`);
+      const twMax = d3.max(alltime, (m) => m.ten_win), twAll = alltime.filter((m) => m.ten_win === twMax).map((m) => m.manager);
+      if (twMax) add('ten-win', 'Consistency', `${twAll.join(' and ')} ${twAll.length === 1 ? 'has' : 'share'} the most 10-win seasons with ${twMax}${twAll.length === 1 ? '' : ' each'}.`);
+      const finalsBlow = teamGames.filter((r) => r.kind === 'Championship' && r.result === 'Won').map((r) => ({ ...r, m: r.score - r.opp_score })).sort((a, b) => b.m - a.m);
+      if (finalsBlow[0]) add('final-blowout', 'Championship', `The most lopsided final was ${finalsBlow[0].season}: ${finalsBlow[0].manager} beat ${finalsBlow[0].opponent} by ${p(finalsBlow[0].m)}.`);
+      if (finalsBlow.length) { const tight = finalsBlow[finalsBlow.length - 1]; add('final-close', 'Championship', `The closest final was ${tight.season}: ${tight.manager} beat ${tight.opponent} by ${p(tight.m)}.`); }
+      const avgFinal = d3.mean(teamGames.filter((r) => r.kind === 'Championship' && r.result === 'Won'), (r) => r.score);
+      if (avgFinal) add('final-avg', 'Championship', `Title winners have averaged ${p(avgFinal)} points in the championship game.`);
+      return f;
+    },
+  });
+  dash.calc('recentRecords', {
+    title: 'Records set in the latest week', description: 'Leaderboard entries, streaks and season marks set or matched in the most recent week of games.',
+    inputs: ['teamGames', 'highReg', 'lowReg', 'highPO', 'lowPO', 'blowouts', 'closest', 'streaks', 'seasonPoints', 'seasonLowPoints', 'seasonHighAvg', 'seasonLowAvg', 'seasonRecords', 'seasonTrades', 'seasonAddDrops', 'seasonAcq'],
+    fn: (teamGames, highReg, lowReg, highPO, lowPO, blowouts, closest, streaks, seasonPoints, seasonLowPoints, seasonHighAvg, seasonLowAvg, seasonRecords, seasonTrades, seasonAddDrops, seasonAcq) => {
+      if (!teamGames.length) return [];
+      const key = (r) => r.season * 100 + r.week;
+      const latest = d3.max(teamGames, key), season = Math.floor(latest / 100), week = latest % 100;
+      const lastGames = teamGames.filter((r) => key(r) === latest);
+      const seasonOver = lastGames.some((r) => r.kind === 'Championship');
+      const out = [], p = (n) => n.toFixed(2);
+      const level = (rank) => (rank === 1 ? 'New league record' : 'No. ' + rank + ' all-time');
+      const scoreBoards = [[highReg, 'Highest score · Regular season'], [lowReg, 'Lowest score · Regular season'], [highPO, 'Highest score · Playoffs'], [lowPO, 'Lowest score · Playoffs']];
+      for (const [rows, board] of scoreBoards) rows.filter((r) => key(r) === latest).forEach((r) =>
+        out.push({ id: board + '|' + r.id, board, level: level(r.rank), rank: r.rank, text: `${r.manager} scored ${p(r.score)} against ${r.opponent} (${p(r.opp_score)}).` }));
+      for (const [rows, board, verb] of [[blowouts, 'Biggest blowout', 'beat'], [closest, 'Closest game', 'edged']]) rows.filter((r) => key(r) === latest).forEach((r) =>
+        out.push({ id: board + '|' + r.id, board, level: level(r.rank), rank: r.rank,
+          text: r.tie ? `${r.winner} and ${r.loser} tied at ${p(r.winner_score)}.` : `${r.winner} ${verb} ${r.loser} ${p(r.winner_score)} to ${p(r.loser_score)}, a ${p(r.margin)}-point margin.` }));
+      const maxW = d3.max(streaks, (s) => s.win_streak) || 0, maxL = d3.max(streaks, (s) => s.loss_streak) || 0;
+      for (const s of streaks) {
+        if (!s.current_type || !lastGames.some((r) => r.manager === s.manager && r.kind === 'Regular season')) continue;
+        const won = s.current_type === 'Won', len = s.current_len, leagueMax = won ? maxW : maxL, own = won ? s.win_streak : s.loss_streak;
+        const word = won ? 'winning' : 'losing', board = won ? 'Winning streak' : 'Losing streak';
+        if (len === leagueMax && len >= 3) {
+          const others = streaks.filter((o) => o.manager !== s.manager && (won ? o.win_streak : o.loss_streak) === len).length;
+          out.push({ id: board + '|' + s.manager, board, level: others ? 'Ties league record' : 'New league record', rank: 1, text: `${s.manager} is on a ${len}-game ${word} streak, the longest in league history.` });
+        } else if (len === own && len >= 4) {
+          out.push({ id: board + '|' + s.manager, board, level: 'Personal record', rank: 20, text: `${s.manager} is on a ${len}-game ${word} streak, the longest of their career.` });
+        }
+      }
+      if (seasonOver) {
+        const seasonBoards = [[seasonPoints, 'Most points in a season', (r) => p(r.value) + ' points'], [seasonLowPoints, 'Fewest points in a season', (r) => p(r.value) + ' points'],
+          [seasonHighAvg, 'Highest avg. score in a season', (r) => p(r.value) + ' per game'], [seasonLowAvg, 'Lowest avg. score in a season', (r) => p(r.value) + ' per game'],
+          [seasonRecords, 'Best regular-season record', (r) => r.record], [seasonTrades, 'Most trades in a season', (r) => r.value + ' trades'],
+          [seasonAddDrops, 'Most add/drops in a season', (r) => r.value + ' add/drops'], [seasonAcq, 'Most acquisitions in a season', (r) => r.value + ' acquisitions']];
+        for (const [rows, board, val] of seasonBoards) rows.filter((r) => r.season === season).forEach((r) =>
+          out.push({ id: board + '|' + r.id, board, level: level(r.rank), rank: r.rank, text: `${r.manager} finished ${season} with ${val(r)}.` }));
+      }
+      return out.sort((a, b) => a.rank - b.rank).map((r) => ({ ...r, season, week }));
+    },
+  });
+</script>
+
+<script>
+  // ---------- Shared drawing helpers ----------
+  const f2 = d3.format('.2f');
+  const enc = (s) => encodeURIComponent(String(s));
+  const when = (r) => r.season + ' · Wk ' + r.week;
+  const chip = (td, text, cls) => { const c = document.createElement('span'); c.className = 'rb-chip ' + (cls || ''); c.textContent = text; td.append(' ', c); };
+  const kindChip = (td, kind) => { if (kind === 'Championship') chip(td, 'Final', 'ch'); else if (kind === 'Playoffs') chip(td, 'Playoff', 'po'); };
+  const statusMsg = (tbody, st, cols) => {
+    const tr = document.createElement('tr'), td = document.createElement('td');
+    td.colSpan = cols; td.className = 'msg';
+    td.textContent = st === 'loading' ? 'Loading…' : st === 'error' ? 'Failed to load' : '—';
+    tr.append(td); tbody.replaceChildren(tr);
+  };
+  const fillRows = (tbody, rows, cols, keyField) => {
+    tbody.replaceChildren(...rows.map((r) => {
+      const tr = document.createElement('tr');
+      tr.setAttribute('data-key', enc(r[keyField || 'id']));
+      for (const c of cols) {
+        const td = document.createElement('td');
+        if (c.cls) td.className = c.cls;
+        td.textContent = c.f ? c.f(r) : (r[c.k] ?? '');
+        if (c.after) c.after(td, r);
+        tr.append(td);
+      }
+      return tr;
+    }));
+  };
+  const fillTable = (tbody, id, cols, keyField) => {
+    const res = dash.data(id);
+    if (res.status !== 'ok') { statusMsg(tbody, res.status, cols.length); return; }
+    fillRows(tbody, res.data || [], cols, keyField);
+  };
+  window.rb = { f2, enc, when, chip, kindChip, statusMsg, fillRows, fillTable };
+</script>
+
+<script>
+  // ---------- Pages (tabs) ----------
+  const pages = () => [...document.querySelectorAll('.rb-page')];
+  const show = (id) => {
+    const all = pages();
+    if (!all.length) return;
+    const target = all.find((p) => p.id === id) ? id : all[0].id;
+    all.forEach((p) => { p.hidden = p.id !== target; });
+    document.querySelectorAll('.rb-tabs a[data-page]').forEach((a) => {
+      const on = a.getAttribute('data-page') === target;
+      a.classList.toggle('on', on);
+      if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+    dash.setLink(target === all[0].id ? null : target);
+  };
+  document.querySelectorAll('.rb-tabs a[data-page]').forEach((a) => {
+    a.addEventListener('click', (e) => { e.preventDefault(); show(a.getAttribute('data-page')); });
+  });
+  window.addEventListener('hashchange', () => show(location.hash.slice(1)));
+  show(location.hash.slice(1));
+  let printWas = null;
+  window.addEventListener('beforeprint', () => { if (printWas) return; printWas = pages().map((p) => p.hidden); pages().forEach((p) => { p.hidden = false; }); });
+  window.addEventListener('afterprint', () => { if (!printWas) return; pages().forEach((p, i) => { p.hidden = printWas[i]; }); printWas = null; });
+</script>
+
+<script>
+  // ---------- All-time standings with sorting ----------
+  const { f2, enc, fillRows, statusMsg } = window.rb;
+  window.rbSort = window.rbSort || { key: 'win_pct', dir: 'desc' };
+  const S = window.rbSort;
+  const syncControls = () => {
+    document.querySelectorAll('#alltime-table th').forEach((th) => {
+      const b = th.querySelector('.rb-sort');
+      if (b && b.getAttribute('data-sort') === S.key) th.setAttribute('aria-sort', S.dir === 'desc' ? 'descending' : 'ascending');
+      else th.removeAttribute('aria-sort');
+    });
+  };
+  const setSort = (key, dir) => { S.key = key; S.dir = dir; syncControls(); dash.draw('alltime'); };
+  document.querySelectorAll('#alltime-table .rb-sort').forEach((b) => b.addEventListener('click', () => {
+    const k = b.getAttribute('data-sort');
+    setSort(k, S.key === k && S.dir === 'desc' ? 'asc' : 'desc');
+  }));
+  syncControls();
+
+  dash.draw('alltime', (tb) => {
+    const r = dash.data('alltime');
+    if (r.status !== 'ok') { statusMsg(tb, r.status, 14); return; }
+    const rows = r.data.slice().sort((a, b) => {
+      const d = S.dir === 'desc' ? b[S.key] - a[S.key] : a[S.key] - b[S.key];
+      return d || b.win_pct - a.win_pct || b.points_for - a.points_for;
+    });
+    rows.forEach((x, i) => { x.pos = i + 1; });
+    const col = (k, extra) => ({ k, cls: 'num' + (S.key === k ? ' sorted' : ''), ...extra });
+    fillRows(tb, rows, [
+      { k: 'pos', cls: 'dim' }, { k: 'manager' }, col('seasons'),
+      { k: 'record', cls: S.key === 'wins' ? 'sorted' : '' },
+      col('win_pct', { f: (x) => x.win_pct.toFixed(1) + '%' }),
+      col('points_for', { f: (x) => f2(x.points_for) }), col('points_against', { f: (x) => f2(x.points_against) }),
+      col('ten_win'), col('win_streak'), col('loss_streak'),
+      col('playoff_apps'), { k: 'playoff_record', cls: S.key === 'playoff_wins' ? 'sorted' : '' }, col('finals'), col('titles'),
+    ], 'manager');
+  });
+</script>
+
+<script>
+  // ---------- Other tables ----------
+  const { f2, when, chip, kindChip, fillTable } = window.rb;
+
+  dash.draw('asOf', (el) => {
+    const r = dash.data('games');
+    if (r.status !== 'ok') { el.textContent = '—'; return; }
+    const cur = d3.max(r.data, (g) => +g.season);
+    const wk = d3.max(r.data.filter((g) => +g.season === cur), (g) => +g.week);
+    el.textContent = 'The ' + cur + ' season is counted through Week ' + wk + '.';
+  });
+
+  dash.draw('champions', (tb) => {
+    const r = dash.data('champions');
+    if (r.status !== 'ok') { window.rb.statusMsg(tb, r.status, 9); return; }
+    window.rb.fillRows(tb, r.data.slice().sort((a, b) => b.season - a.season), [
+      { k: 'season' }, { k: 'champion' }, { k: 'champion_team', cls: 'dim' }, { k: 'champion_record' },
+      { k: 'runner_up' }, { k: 'third_place' }, { k: 'top_seed' }, { k: 'most_points' },
+      { k: 'most_points_total', cls: 'num', f: (x) => f2(+x.most_points_total) },
+    ], 'season');
+  });
+
+  const scoreCols = [
+    { k: 'rank', cls: 'dim' }, { k: 'manager' }, { k: 'score', cls: 'num', f: (r) => f2(r.score) },
+    { k: 'opponent', cls: 'dim' }, { k: 'when', cls: 'dim', f: when, after: (td, r) => kindChip(td, r.kind) },
+  ];
+  ['highReg', 'lowReg', 'highPO', 'lowPO'].forEach((id) => dash.draw(id, (tb) => fillTable(tb, id, scoreCols)));
+
+  const marginCols = [
+    { k: 'rank', cls: 'dim' }, { k: 'winner' }, { k: 'loser', cls: 'dim' },
+    { k: 'score', f: (r) => f2(r.winner_score) + ' – ' + f2(r.loser_score) },
+    { k: 'margin', cls: 'num', f: (r) => f2(r.margin) },
+    { k: 'when', cls: 'dim', f: when, after: (td, r) => { kindChip(td, r.kind); if (r.tie) chip(td, 'Tie'); } },
+  ];
+  dash.draw('blowouts', (tb) => fillTable(tb, 'blowouts', marginCols));
+  dash.draw('closest', (tb) => fillTable(tb, 'closest', marginCols));
+
+  const seasonCols = (fmt) => [
+    { k: 'rank', cls: 'dim' }, { k: 'manager' }, { k: 'season', cls: 'dim' },
+    { k: 'value', cls: 'num', f: (r) => fmt(r.value) }, { k: 'record' }, { k: 'finish_label', cls: 'dim' },
+  ];
+  const int = (v) => String(v);
+  [['seasonPoints', f2], ['seasonLowPoints', f2], ['seasonHighAvg', f2], ['seasonLowAvg', f2], ['seasonTrades', int], ['seasonAddDrops', int], ['seasonAcq', int]]
+    .forEach(([id, fmt]) => dash.draw(id, (tb) => fillTable(tb, id, seasonCols(fmt))));
+  dash.draw('seasonRecords', (tb) => fillTable(tb, 'seasonRecords', [
+    { k: 'rank', cls: 'dim' }, { k: 'manager' }, { k: 'season', cls: 'dim' }, { k: 'record' },
+    { k: 'points_for', cls: 'num', f: (r) => f2(r.points_for) }, { k: 'finish_label', cls: 'dim' },
+  ]));
+
+  const signed = (v) => (v > 0 ? '+' : v < 0 ? '−' : '') + f2(Math.abs(v));
+  dash.draw('luckSeasons', (tb) => fillTable(tb, 'luckSeasons', [
+    { k: 'manager' }, { k: 'season', cls: 'dim' }, { k: 'wins', cls: 'num', f: (r) => String(r.wins) },
+    { k: 'expected_wins', cls: 'num', f: (r) => f2(r.expected_wins) }, { k: 'luck', cls: 'num', f: (r) => signed(r.luck) },
+  ]));
+  dash.draw('benchAll', (tb) => fillTable(tb, 'benchAll', [
+    { k: 'rank', cls: 'dim' }, { k: 'manager' }, { k: 'bench_points', cls: 'num', f: (r) => f2(r.bench_points) },
+    { k: 'games', cls: 'num' }, { k: 'per_game', cls: 'num', f: (r) => f2(r.per_game) },
+  ], 'manager'));
+  dash.draw('benchWeeks', (tb) => fillTable(tb, 'benchWeeks', [
+    { k: 'rank', cls: 'dim' }, { k: 'manager' }, { k: 'bench', cls: 'num', f: (r) => f2(r.bench) },
+    { k: 'started', cls: 'num', f: (r) => f2(r.started) }, { k: 'result', cls: 'dim' }, { k: 'when', cls: 'dim', f: when },
+  ]));
+</script>
+
+<script>
+  // ---------- Fun facts ----------
+  const { enc: fenc } = window.rb;
+  window.rbFacts = window.rbFacts || { seed: Math.floor(Math.random() * 1e9) };
+  const SHOW = 9;
+  const shuffled = (arr, seed) => {
+    const a = arr.slice(); let s = seed;
+    const rnd = () => { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; };
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+  };
+  document.querySelectorAll('#facts-shuffle').forEach((b) => b.addEventListener('click', () => {
+    window.rbFacts.seed = Math.floor(Math.random() * 1e9);
+    dash.draw('facts');
+  }));
+  dash.draw('facts', (ul) => {
+    const r = dash.data('funFacts');
+    if (r.status !== 'ok' || !Array.isArray(r.data)) {
+      const li = document.createElement('li'); li.textContent = r.status === 'loading' ? 'Loading…' : r.status === 'error' ? 'Failed to load' : '—';
+      ul.replaceChildren(li); return;
+    }
+    const pick = shuffled(r.data, window.rbFacts.seed).slice(0, SHOW);
+    ul.replaceChildren(...pick.map((x) => {
+      const li = document.createElement('li');
+      const c = document.createElement('span'); c.className = 'cat'; c.textContent = x.category;
+      const t = document.createElement('span'); t.className = 'txt'; t.textContent = x.fact;
+      t.setAttribute('data-source', 'funFacts'); t.setAttribute('data-field', 'fact'); t.setAttribute('data-where', 'id=' + fenc(x.id));
+      li.append(c, t); return li;
+    }));
+  });
+  dash.draw('factCount', (el) => {
+    const r = dash.data('funFacts');
+    el.textContent = r.status === 'ok' && Array.isArray(r.data) ? 'Showing ' + Math.min(SHOW, r.data.length) + ' of ' + r.data.length + ' facts.' : '—';
+  });
+</script>
+
+<script>
+  // ---------- Head-to-head picker ----------
+  const { f2: hf2, enc: henc, when: hwhen, kindChip: hchip } = window.rb;
+  window.rbH2H = window.rbH2H || { a: null, b: null };
+  const st = window.rbH2H;
+  const managers = () => { const r = dash.data('alltime'); return r.status === 'ok' ? r.data.map((d) => d.manager) : []; };
+  const ensure = () => {
+    const ms = managers();
+    if (ms.length < 2) return;
+    if (!st.a || !ms.includes(st.a)) st.a = ms[0];
+    if (!st.b || !ms.includes(st.b) || st.b === st.a) st.b = ms.find((m) => m !== st.a);
+  };
+  const fillSelect = (sel, key) => {
+    ensure();
+    sel.replaceChildren(...managers().slice().sort().map((m) => new Option(m, m)));
+    if (st[key]) sel.value = st[key];
+    sel.onchange = () => {
+      st[key] = sel.value;
+      if (st.a === st.b) { const other = key === 'a' ? 'b' : 'a'; st[other] = managers().find((m) => m !== sel.value); }
+      dash.draw('h2hA'); dash.draw('h2hB'); dash.draw('h2hResult');
+    };
+  };
+  dash.draw('h2hA', (sel) => fillSelect(sel, 'a'));
+  dash.draw('h2hB', (sel) => fillSelect(sel, 'b'));
+  dash.draw('h2hResult', (el) => {
+    ensure();
+    const pr = dash.data('h2h'), gr = dash.data('games');
+    const msg = (text) => { const p = document.createElement('p'); p.className = 'rb-sub'; p.textContent = text; el.replaceChildren(p); };
+    if (pr.status !== 'ok' || gr.status !== 'ok') { msg(pr.status === 'error' || gr.status === 'error' ? 'Failed to load' : 'Loading…'); return; }
+    const id = st.a + '|' + st.b, row = pr.data.find((r) => r.id === id);
+    if (!row) { msg(st.a + ' and ' + st.b + ' have never played each other.'); return; }
+    const where = 'id=' + henc(id);
+    const tile = (label, field, text) => {
+      const d = document.createElement('div'); d.className = 'rb-tile';
+      const k = document.createElement('span'); k.className = 'k'; k.textContent = label;
+      const v = document.createElement('span'); v.className = 'v';
+      v.setAttribute('data-source', 'h2h'); v.setAttribute('data-field', field); v.setAttribute('data-where', where);
+      v.textContent = text; d.append(k, v); return d;
+    };
+    const tiles = document.createElement('div'); tiles.className = 'rb-tiles';
+    tiles.append(tile(row.a + ' wins', 'a_wins', String(row.a_wins)), tile(row.b + ' wins', 'b_wins', String(row.b_wins)),
+      tile(row.a + ' avg. score', 'a_avg', hf2(row.a_avg)), tile(row.b + ' avg. score', 'b_avg', hf2(row.b_avg)),
+      tile('Playoff meetings', 'playoff_games', String(row.playoff_games)));
+    const meet = gr.data.filter((g) => (g.home === st.a && g.away === st.b) || (g.home === st.b && g.away === st.a))
+      .sort((x, y) => (+y.season - +x.season) || (+y.week - +x.week));
+    const wrap = document.createElement('div'); wrap.className = 'rb-scroll';
+    const t = document.createElement('table'); t.className = 'rb-t'; t.setAttribute('data-source', 'games'); t.setAttribute('data-row-key', 'id');
+    const th = document.createElement('thead'), hr = document.createElement('tr');
+    ['When', 'Winner', row.a, row.b].forEach((txt, i) => { const h = document.createElement('th'); h.textContent = txt; if (i > 1) h.className = 'num'; hr.append(h); });
+    th.append(hr);
+    const tb = document.createElement('tbody');
+    for (const g of meet) {
+      const aS = g.home === st.a ? +g.home_score : +g.away_score, bS = g.home === st.a ? +g.away_score : +g.home_score;
+      const tr = document.createElement('tr'); tr.setAttribute('data-key', henc(g.id));
+      const c1 = document.createElement('td'); c1.className = 'dim'; c1.textContent = hwhen({ season: g.season, week: g.week }); hchip(c1, g.kind);
+      const c2 = document.createElement('td'); c2.textContent = aS > bS ? st.a : bS > aS ? st.b : 'Tie';
+      const c3 = document.createElement('td'); c3.className = 'num'; c3.textContent = hf2(aS);
+      const c4 = document.createElement('td'); c4.className = 'num'; c4.textContent = hf2(bS);
+      tr.append(c1, c2, c3, c4); tb.append(tr);
+    }
+    t.append(th, tb); wrap.append(t); el.replaceChildren(tiles, wrap);
+  });
+</script>
+
+<script>
+  // ---------- Luck chart ----------
+  dash.draw('luckChart', {
+    mount: (el) => {
+      const svg = d3.select(el).append('svg').attr('role', 'img').attr('aria-label', 'Bar chart of all-time regular-season wins above or below expected wins for each manager');
+      const tip = d3.select(el).append('div').attr('class', 'rb-tip').attr('hidden', '');
+      return { svg, tip };
+    },
+    update: (el, made) => {
+      const { svg, tip } = made;
+      const r = dash.data('luck');
+      svg.selectAll('*').remove();
+      el.querySelectorAll('.rb-msg').forEach((n) => n.remove());
+      if (r.status !== 'ok') {
+        const p = document.createElement('p'); p.className = 'rb-sub rb-msg';
+        p.textContent = r.status === 'loading' ? 'Loading…' : r.status === 'error' ? 'Failed to load' : '—';
+        el.prepend(p); svg.attr('height', 0); return;
+      }
+      const data = r.data, fmt = (v) => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2);
+      const W = Math.max(280, el.clientWidth), top = 8, bottom = 24, rowH = 26;
+      const H = top + bottom + rowH * data.length;
+      svg.attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+      const probe = svg.append('g');
+      const lw = d3.max(data, (d) => probe.append('text').text(d.manager).node().getComputedTextLength()) || 90;
+      const vw = d3.max(data, (d) => probe.append('text').text(fmt(d.luck)).node().getComputedTextLength()) || 40;
+      probe.remove();
+      const ext = d3.max(data, (d) => Math.abs(d.luck)) || 1;
+      const x = d3.scaleLinear().domain([-ext, ext]).range([lw + 12 + vw + 6, W - vw - 10]).nice();
+      const y = d3.scaleBand().domain(data.map((d) => d.manager)).range([top, H - bottom]).padding(0.25);
+      const ticks = x.ticks(Math.max(2, Math.floor((W - lw) / 90)));
+      svg.append('g').selectAll('line').data(ticks).join('line')
+        .attr('x1', (t) => x(t)).attr('x2', (t) => x(t)).attr('y1', top).attr('y2', H - bottom)
+        .style('stroke', (t) => (t === 0 ? 'var(--cds-chart-reference)' : 'var(--cds-chart-grid)'));
+      svg.append('g').selectAll('text').data(ticks).join('text').attr('x', (t) => x(t)).attr('y', H - 6).attr('text-anchor', 'middle')
+        .text((t) => (t > 0 ? '+' : t < 0 ? '−' : '') + Math.abs(t));
+      svg.append('g').selectAll('text').data(data).join('text').attr('x', 0).attr('y', (d) => y(d.manager) + y.bandwidth() / 2).attr('dy', '0.35em')
+        .style('fill', 'var(--color-fg)').text((d) => d.manager);
+      svg.append('g').selectAll('rect').data(data).join('rect')
+        .attr('x', (d) => Math.min(x(0), x(d.luck))).attr('width', (d) => Math.abs(x(d.luck) - x(0)))
+        .attr('y', (d) => y(d.manager)).attr('height', y.bandwidth()).attr('rx', 2)
+        .style('fill', (d) => (d.luck >= 0 ? dash.colors[0] : dash.colors[1]))
+        .on('pointerenter pointermove', (ev, d) => {
+          const [mx, my] = d3.pointer(ev, el);
+          tip.attr('hidden', null).selectAll('*').remove();
+          tip.append('div').style('font-weight', '600').text(d.manager);
+          tip.append('div').text('Wins: ' + d.wins + ' · Expected: ' + d.expected_wins.toFixed(2));
+          tip.append('div').text('Luck: ' + fmt(d.luck) + ' wins');
+          const tw = tip.node().offsetWidth;
+          tip.style('left', Math.min(Math.max(0, mx + 12), el.clientWidth - tw) + 'px').style('top', (my + 12) + 'px');
+        })
+        .on('pointerleave', () => tip.attr('hidden', ''));
+      svg.append('g').selectAll('text').data(data).join('text')
+        .attr('x', (d) => (d.luck >= 0 ? x(d.luck) + 4 : x(d.luck) - 4)).attr('text-anchor', (d) => (d.luck >= 0 ? 'start' : 'end'))
+        .attr('y', (d) => y(d.manager) + y.bandwidth() / 2).attr('dy', '0.35em').text((d) => fmt(d.luck));
+    },
+  });
+</script>
+
+<script>
+  // ---------- Recent records ----------
+  const { enc: renc } = window.rb;
+  dash.draw('recentWeek', (el) => {
+    const g = dash.data('games');
+    if (g.status !== 'ok' || !g.data.length) { el.textContent = '—'; return; }
+    const latest = d3.max(g.data, (r) => +r.season * 100 + +r.week);
+    el.textContent = 'Records set in ' + Math.floor(latest / 100) + ' Week ' + (latest % 100);
+  });
+  dash.draw('recent', (ul) => {
+    const r = dash.data('recentRecords');
+    const one = (text, cls) => { const li = document.createElement('li'); li.className = cls || ''; li.textContent = text; ul.replaceChildren(li); };
+    if (r.status !== 'ok' || !Array.isArray(r.data)) { one(r.status === 'loading' ? 'Loading…' : r.status === 'error' ? 'Failed to load' : '—'); return; }
+    if (!r.data.length) { one('No records were set or matched this week.', 'rb-empty'); return; }
+    ul.replaceChildren(...r.data.map((x) => {
+      const li = document.createElement('li');
+      const top = document.createElement('div'); top.className = 'top';
+      const c = document.createElement('span'); c.className = 'cat'; c.textContent = x.board;
+      const lv = document.createElement('span'); lv.className = 'rb-chip' + (x.rank === 1 ? ' rec' : ''); lv.textContent = x.level;
+      top.append(c, lv);
+      const t = document.createElement('span'); t.className = 'txt'; t.textContent = x.text;
+      t.setAttribute('data-source', 'recentRecords'); t.setAttribute('data-field', 'text'); t.setAttribute('data-where', 'id=' + renc(x.id));
+      li.append(top, t); return li;
+    }));
+  });
+</script>
