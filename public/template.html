@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The XFFL Record Book Bible</title>
+<meta name="description" content="Every XFFL fantasy football record since 2020: standings, champions, single-game and season records, head-to-head and more.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+  /* Tokens matching the names the record book page uses */
+  :root {
+    --color-bg: #f7f7f5; --color-panel: #ffffff; --color-fg: #1d1f22; --color-fg-muted: #626770;
+    --color-border-line: #e2e2dd; --color-ok: #2f8a4c; --color-warn: #b7791f; --color-bad: #c0392b;
+    --series-1: #2f6fb3; --series-2: #c46a2b; --series-3: #6a5acd; --series-4: #2a9d8f;
+    --cds-text-secondary: #626770; --cds-chart-grid: #ececE8; --cds-chart-reference: #9aa0a8; --cds-chart-axis: #c8c8c2;
+    --cds-surface-popover: #ffffff; --cds-border: #d9d9d3; --cds-shadow-popover: 0 6px 20px rgba(20, 22, 26, 0.12);
+    --font-anthropic-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-anthropic-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --cds-font-size-caption: 12px; --cds-font-size-body: 14px; --cds-font-size-heading: 18px; --cds-font-size-title: 28px;
+    --cds-font-weight-medium: 600;
+    --cds-gap-xs: 4px; --cds-gap-sm: 8px; --cds-gap-md: 12px; --cds-gap-lg: 20px; --cds-gap-xl: 32px;
+    --cds-pad-xs: 4px; --cds-pad-sm: 8px; --cds-pad-md: 12px; --cds-pad-lg: 16px; --cds-pad-xl: 24px;
+    --cds-radius: 8px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-bg: #141518; --color-panel: #1c1e22; --color-fg: #ececea; --color-fg-muted: #a0a5ad;
+      --color-border-line: #2e3137; --color-ok: #4cb36d; --color-warn: #d9a441; --color-bad: #e06c5f;
+      --series-1: #5b9be0; --series-2: #e08a4f; --series-3: #9c8cf0; --series-4: #4cc0b2;
+      --cds-text-secondary: #a0a5ad; --cds-chart-grid: #26292e; --cds-chart-reference: #6b717a; --cds-chart-axis: #3a3e45;
+      --cds-surface-popover: #23262b; --cds-border: #383c43; --cds-shadow-popover: 0 6px 20px rgba(0, 0, 0, 0.5);
+      color-scheme: dark;
+    }
+  }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--color-bg); color: var(--color-fg);
+    font-family: var(--font-anthropic-sans); font-size: var(--cds-font-size-body); line-height: 1.4;
+  }
+  .site {
+    max-width: 1200px; margin: 0 auto;
+    padding-block: max(24px, env(safe-area-inset-top, 0px)) 48px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  [hidden] { display: none !important; }
+  .dash-select {
+    font: inherit; color: var(--color-fg); background-color: var(--color-panel);
+    border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: 6px 10px; max-width: 100%;
+  }
+  .dash-select:focus-visible { outline: 2px solid var(--color-fg-muted); outline-offset: 2px; }
+  .site-foot { margin-top: var(--cds-gap-xl); color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  @media (max-width: 480px) { :root { --cds-font-size-title: 24px; } }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="dash-lite.js"></script>
+</head>
+<body>
+<main class="site">
+{{PAGE}}
+<footer class="site-foot">Data from ESPN, last updated {{UPDATED}}.</footer>
+</main>
+<script>window.dashStart();</script>
+</body>
+</html>
