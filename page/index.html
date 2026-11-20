@@ -52,7 +52,7 @@
   .rb-btn { font: inherit; color: var(--color-fg); background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: 6px 14px; cursor: pointer; }
   .rb-btn:hover { border-color: var(--color-fg-muted); }
   .rb-btn:focus-visible { outline: 2px solid var(--color-fg-muted); outline-offset: 2px; }
-  .rb-chart { position: relative; min-height: 280px; }
+  .rb-chart { position: relative; min-height: 280px; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
   .rb-chart svg text { fill: var(--cds-text-secondary); font-size: var(--cds-font-size-caption); }
   .rb-tip { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); box-shadow: var(--cds-shadow-popover); border-radius: var(--cds-radius); padding: 6px 10px; font-size: var(--cds-font-size-caption); white-space: nowrap; }
   .rb-rev-top { display: flex; flex-wrap: wrap; gap: var(--cds-gap-lg); justify-content: space-between; align-items: flex-start; }
