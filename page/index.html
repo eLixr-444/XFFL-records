@@ -285,13 +285,6 @@
   <section class="rb-page" id="facts" hidden>
     <h2>Miscellaneous</h2>
     <p>Luck, bench warmers and fun facts from every game and season in the record book.</p>
-    <div class="rb-grid">
-      <div class="rb-card" id="luck-chart">
-        <h3>All-time wins above or below expected</h3>
-        <p class="rb-sub">Expected wins count how many teams you outscored each week, as if you played everyone.</p>
-        <div class="rb-chart" data-draw="luckChart" data-source="luck"></div>
-      </div>
-    </div>
     <h3 class="rb-subhead" id="luck">Luck</h3>
     <div class="rb-grid">
       <div class="rb-card" id="luck-rating">
@@ -299,11 +292,26 @@
         <p class="rb-sub">Based on close wins/losses (under 5 points), weighted based on points volume. 10 is the best luck, 0 the worst, 5 neutral.</p>
         <div class="rb-chart" data-draw="luckRatingChart" data-source="luckRating"></div>
       </div>
-      <div class="rb-card" id="luck-seasons">
-        <h3>Luckiest and unluckiest seasons</h3>
-        <div class="rb-scroll"><table class="rb-t" data-source="luckSeasons" data-row-key="id">
-          <thead><tr><th data-field="manager">Manager</th><th data-field="season">Season</th><th class="num" data-field="wins">Wins</th><th class="num" data-field="expected_wins">Expected</th><th class="num" data-field="luck">Luck</th></tr></thead>
-          <tbody data-draw="luckSeasons"></tbody>
+    </div>
+    <h3 class="rb-subhead" id="underdogs">Underdogs and Upsets</h3>
+    <div class="rb-grid">
+      <div class="rb-card" id="luck-chart">
+        <h3>All-time wins above or below expected</h3>
+        <p class="rb-sub">Expected wins count how many teams you outscored each week, as if you played everyone.</p>
+        <div class="rb-chart" data-draw="luckChart" data-source="luck"></div>
+      </div>
+      <div class="rb-card" id="seasons-above">
+        <h3>Top 10 seasons above expected wins</h3>
+        <div class="rb-scroll"><table class="rb-t" data-source="seasonsAbove" data-row-key="id">
+          <thead><tr><th>#</th><th data-field="manager">Manager</th><th data-field="season">Season</th><th class="num" data-field="wins">Wins</th><th class="num" data-field="expected_wins">Expected</th><th class="num" data-field="diff">Diff</th></tr></thead>
+          <tbody data-draw="seasonsAbove"></tbody>
+        </table></div>
+      </div>
+      <div class="rb-card" id="seasons-below">
+        <h3>Top 10 seasons below expected wins</h3>
+        <div class="rb-scroll"><table class="rb-t" data-source="seasonsBelow" data-row-key="id">
+          <thead><tr><th>#</th><th data-field="manager">Manager</th><th data-field="season">Season</th><th class="num" data-field="wins">Wins</th><th class="num" data-field="expected_wins">Expected</th><th class="num" data-field="diff">Diff</th></tr></thead>
+          <tbody data-draw="seasonsBelow"></tbody>
         </table></div>
       </div>
     </div>
@@ -492,14 +500,15 @@
       return [...by.values()].map((m) => ({ manager: m.manager, wins: m.wins, expected_wins: Math.round(m.expected_wins * 100) / 100, luck: Math.round((m.wins - m.expected_wins) * 100) / 100 })).sort((a, b) => b.luck - a.luck);
     },
   });
-  dash.calc('luckSeasons', {
-    title: 'Luckiest and unluckiest seasons', description: 'The five completed seasons most above and most below expected wins.', inputs: ['seasons'],
-    fn: (seasons) => {
-      const rows = seasons.filter((s) => s.status === 'Complete').map((s) => ({ id: s.id, manager: s.manager, season: +s.season, wins: +s.wins + s.ties / 2, expected_wins: +s.expected_wins,
-        luck: Math.round((+s.wins + s.ties / 2 - s.expected_wins) * 100) / 100 })).sort((a, b) => b.luck - a.luck);
-      return [...rows.slice(0, 5), ...rows.slice(-5)];
-    },
+  dash.calc('seasonLuck', {
+    title: 'Wins compared with expected, by season', description: 'Each completed season with its wins, expected wins and the difference.', inputs: ['seasons'],
+    fn: (seasons) => seasons.filter((s) => s.status === 'Complete').map((s) => ({ id: s.id, manager: s.manager, season: +s.season, wins: +s.wins + s.ties / 2, expected_wins: +s.expected_wins,
+      diff: Math.round((+s.wins + s.ties / 2 - s.expected_wins) * 100) / 100 })),
   });
+  dash.calc('seasonsAbove', { title: 'Top 10 seasons above expected wins', description: 'The ten completed seasons with the most wins above expected.', inputs: ['seasonLuck'],
+    fn: (rows) => rows.slice().sort((a, b) => b.diff - a.diff).slice(0, 10).map((r, i) => ({ ...r, rank: i + 1 })) });
+  dash.calc('seasonsBelow', { title: 'Top 10 seasons below expected wins', description: 'The ten completed seasons with the most wins below expected.', inputs: ['seasonLuck'],
+    fn: (rows) => rows.slice().sort((a, b) => a.diff - b.diff).slice(0, 10).map((r, i) => ({ ...r, rank: i + 1 })) });
   dash.calc('luckRating', {
     title: 'Luck rating', description: 'A 0-10 rating per manager from close games (decided by under 5 points): weighted close wins minus weighted close losses per game, weighted by points volume. 10 is the best luck, 0 the worst, 5 neutral, on a fixed scale.',
     inputs: ['teamGames'],
@@ -818,10 +827,12 @@
   ]));
 
   const signed = (v) => (v > 0 ? '+' : v < 0 ? '−' : '') + f2(Math.abs(v));
-  dash.draw('luckSeasons', (tb) => fillTable(tb, 'luckSeasons', [
-    { k: 'manager' }, { k: 'season', cls: 'dim' }, { k: 'wins', cls: 'num', f: (r) => String(r.wins) },
-    { k: 'expected_wins', cls: 'num', f: (r) => f2(r.expected_wins) }, { k: 'luck', cls: 'num', f: (r) => signed(r.luck) },
-  ]));
+  const luckCols = [
+    { k: 'rank', cls: 'dim' }, { k: 'manager' }, { k: 'season', cls: 'dim' }, { k: 'wins', cls: 'num', f: (r) => String(r.wins) },
+    { k: 'expected_wins', cls: 'num', f: (r) => f2(r.expected_wins) }, { k: 'diff', cls: 'num', f: (r) => signed(r.diff) },
+  ];
+  dash.draw('seasonsAbove', (tb) => fillTable(tb, 'seasonsAbove', luckCols));
+  dash.draw('seasonsBelow', (tb) => fillTable(tb, 'seasonsBelow', luckCols));
   dash.draw('benchAll', (tb) => fillTable(tb, 'benchAll', [
     { k: 'rank', cls: 'dim' }, { k: 'manager' }, { k: 'bench_points', cls: 'num', f: (r) => f2(r.bench_points) },
     { k: 'games', cls: 'num' }, { k: 'per_game', cls: 'num', f: (r) => f2(r.per_game) },
