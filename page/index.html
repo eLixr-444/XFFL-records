@@ -55,6 +55,13 @@
   .rb-chart { position: relative; min-height: 280px; }
   .rb-chart svg text { fill: var(--cds-text-secondary); font-size: var(--cds-font-size-caption); }
   .rb-tip { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); box-shadow: var(--cds-shadow-popover); border-radius: var(--cds-radius); padding: 6px 10px; font-size: var(--cds-font-size-caption); white-space: nowrap; }
+  .rb-rev-top { display: flex; flex-wrap: wrap; gap: var(--cds-gap-lg); justify-content: space-between; align-items: flex-start; }
+  .rb-rev-pick { display: grid; grid-template-columns: auto minmax(0, 220px); gap: var(--cds-gap-sm) var(--cds-gap-md); align-items: center; }
+  .rb-rev-pick label { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .rb-rev-tiles { display: grid; gap: var(--cds-gap-md); min-width: 200px; }
+  .rb-rev-tiles .why { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .rb-t td.won { font-weight: var(--cds-font-weight-medium); color: var(--color-ok); }
+  .rb-t td.lost { color: var(--color-bad); }
   .rb-notes summary { cursor: pointer; color: var(--color-fg-muted); }
   .rb-notes ul { margin: var(--cds-gap-sm) 0 0; padding-left: 20px; color: var(--color-fg-muted); max-width: 72ch; display: grid; gap: 4px; }
   @media print {
@@ -73,6 +80,7 @@
       <a href="#games" data-page="games">Single-game records</a>
       <a href="#seasons" data-page="seasons">Season records</a>
       <a href="#h2h" data-page="h2h">Head-to-head</a>
+      <a href="#revisionist" data-page="revisionist">Revisionist machine</a>
       <a href="#facts" data-page="facts">Miscellaneous</a>
       <a href="#recent" data-page="recent">Recent records</a>
     </nav>
@@ -253,6 +261,25 @@
       </div>
       <div class="rb-h2h" data-draw="h2hResult"></div>
     </div>
+  </section>
+
+  <section class="rb-page" id="revisionist" hidden>
+    <h2>Revisionist machine</h2>
+    <p>Rewrite history. Pick a manager and a season, then hand them someone else's schedule. Their weekly scores stay the same, but they face that manager's opponents. Regular season only.</p>
+    <div class="rb-card">
+      <div class="rb-rev-top">
+        <div class="rb-rev-pick">
+          <label for="rev-coach">Manager</label>
+          <select class="dash-select" id="rev-coach" data-draw="revCoach" data-source="games"></select>
+          <label for="rev-year">Season</label>
+          <select class="dash-select" id="rev-year" data-draw="revYear" data-source="games"></select>
+          <label for="rev-sched">Schedule</label>
+          <select class="dash-select" id="rev-sched" data-draw="revSched" data-source="games"></select>
+        </div>
+        <div class="rb-rev-tiles" data-draw="revTiles"></div>
+      </div>
+    </div>
+    <div class="rb-card" data-draw="revResult"></div>
   </section>
 
   <section class="rb-page" id="facts" hidden>
@@ -861,6 +888,108 @@
       tr.append(c1, c2, c3, c4); tb.append(tr);
     }
     t.append(th, tb); wrap.append(t); el.replaceChildren(tiles, wrap);
+  });
+</script>
+
+<script>
+  // ---------- Revisionist machine ----------
+  const { f2: vf2, enc: venc } = window.rb;
+  window.rbRev = window.rbRev || { coach: null, year: null, sched: null };
+  const rv = window.rbRev;
+  const regGames = () => { const r = dash.data('games'); return r.status === 'ok' ? r.data.filter((g) => g.kind === 'Regular season') : null; };
+  const yearGames = (games, y) => games.filter((g) => +g.season === y);
+  const playersIn = (gs) => [...new Set(gs.flatMap((g) => [g.home, g.away]))].sort();
+  const side = (g, m) => (g.home === m ? { me: +g.home_score, opp: g.away, oppScore: +g.away_score } : { me: +g.away_score, opp: g.home, oppScore: +g.home_score });
+  const recText = (r) => r.w + '-' + r.l + (r.t ? '-' + r.t : '');
+  // Coach A plays coach B's schedule. A keeps their own weekly score; when B's opponent was A, A plays B instead.
+  const simulate = (gs, a, b) => {
+    const mine = new Map(gs.filter((g) => g.home === a || g.away === a).map((g) => [+g.week, side(g, a).me]));
+    const rows = [], rec = { w: 0, l: 0, t: 0 };
+    gs.filter((g) => g.home === b || g.away === b).sort((x, y) => +x.week - +y.week).forEach((g) => {
+      const wk = +g.week, s = side(g, b);
+      if (!mine.has(wk)) return;
+      const opp = s.opp === a ? b : s.opp, oppScore = s.opp === a ? s.me : s.oppScore, me = mine.get(wk);
+      const result = me > oppScore ? 'Won' : me < oppScore ? 'Lost' : 'Tied';
+      rec[result === 'Won' ? 'w' : result === 'Lost' ? 'l' : 't']++;
+      rows.push({ id: g.id, week: wk, opp, me, oppScore, schedScore: s.me, result });
+    });
+    return { rows, rec };
+  };
+  const ensureRev = () => {
+    const games = regGames();
+    if (!games || !games.length) return null;
+    const coaches = playersIn(games);
+    if (!coaches.includes(rv.coach)) rv.coach = coaches[0];
+    const years = [...new Set(games.filter((g) => g.home === rv.coach || g.away === rv.coach).map((g) => +g.season))].sort((x, y) => y - x);
+    if (!years.includes(rv.year)) rv.year = years[0];
+    const gs = yearGames(games, rv.year), field = playersIn(gs);
+    const all = field.map((m) => ({ m, ...simulate(gs, rv.coach, m) }));
+    const score = (x) => x.rec.w + x.rec.t / 2;
+    if (!field.includes(rv.sched)) rv.sched = all.slice().sort((x, y) => score(y) - score(x) || (x.m === rv.coach) - (y.m === rv.coach))[0].m;
+    return { coaches, years, field, gs, all, score };
+  };
+  const redrawRev = () => ['revCoach', 'revYear', 'revSched', 'revTiles', 'revResult'].forEach((n) => dash.draw(n));
+  const revSelect = (sel, opts, key, label) => {
+    const st = ensureRev();
+    if (!st) { sel.replaceChildren(new Option('Loading…', '')); return; }
+    sel.replaceChildren(...opts(st).map((v) => new Option(label ? label(v) : String(v), String(v))));
+    sel.value = String(rv[key]);
+    sel.onchange = () => { rv[key] = key === 'year' ? +sel.value : sel.value; redrawRev(); };
+  };
+  dash.draw('revCoach', (sel) => revSelect(sel, (st) => st.coaches, 'coach'));
+  dash.draw('revYear', (sel) => revSelect(sel, (st) => st.years, 'year'));
+  dash.draw('revSched', (sel) => revSelect(sel, (st) => st.field, 'sched', (m) => (m === rv.coach ? m + ' (own schedule)' : m + "'s schedule")));
+
+  dash.draw('revTiles', (el) => {
+    const st = ensureRev();
+    if (!st) { el.textContent = regGames() ? '—' : 'Loading…'; return; }
+    const own = st.all.find((x) => x.m === rv.coach);
+    const top = d3.max(st.all, st.score), best = st.all.filter((x) => st.score(x) === top);
+    const tile = (label, text, why) => {
+      const d = document.createElement('div'); d.className = 'rb-tile';
+      const k = document.createElement('span'); k.className = 'k'; k.textContent = label;
+      const v = document.createElement('span'); v.className = 'v'; v.textContent = text;
+      d.append(k, v);
+      if (why) { const w = document.createElement('span'); w.className = 'why'; w.textContent = why; d.append(w); }
+      return d;
+    };
+    const names = best.map((x) => (x.m === rv.coach ? 'their own' : x.m + "'s"));
+    el.replaceChildren(
+      tile('Real record:', recText(own.rec)),
+      tile('Best possible record', recText(best[0].rec), 'With ' + names.join(' or ') + ' schedule'),
+    );
+  });
+
+  dash.draw('revResult', (el) => {
+    const st = ensureRev();
+    if (!st) { const p = document.createElement('p'); p.className = 'rb-sub'; p.textContent = regGames() ? '—' : 'Loading…'; el.replaceChildren(p); return; }
+    const a = rv.coach, b = rv.sched, sim = st.all.find((x) => x.m === b), self = a === b;
+    const h = document.createElement('h3');
+    h.textContent = self ? `${a}'s real ${rv.year} schedule: ${recText(sim.rec)}` : `${a} with ${b}'s ${rv.year} schedule: ${recText(sim.rec)}`;
+    const sub = document.createElement('p'); sub.className = 'rb-sub';
+    sub.textContent = self ? 'Pick another schedule to see how things could have gone.'
+      : `${a}'s scores replace ${b}'s every week. When ${b} played ${a}, ${a} plays ${b} instead.`;
+    const wrap = document.createElement('div'); wrap.className = 'rb-scroll';
+    const t = document.createElement('table'); t.className = 'rb-t'; t.setAttribute('data-source', 'games'); t.setAttribute('data-row-key', 'id');
+    const hr = document.createElement('tr');
+    const heads = ['Week', 'Opponent', a, 'Opponent score', 'Result'];
+    if (!self) heads.push(b + ' actually scored');
+    heads.forEach((txt, i) => { const th = document.createElement('th'); th.textContent = txt; if (i === 0 || i === 2 || i === 3 || i === 5) th.className = 'num'; hr.append(th); });
+    const thead = document.createElement('thead'); thead.append(hr);
+    const tb = document.createElement('tbody');
+    for (const r of sim.rows) {
+      const tr = document.createElement('tr'); tr.setAttribute('data-key', venc(r.id));
+      const td = (txt, cls) => { const c = document.createElement('td'); c.textContent = txt; if (cls) c.className = cls; tr.append(c); };
+      td(String(r.week), 'num dim'); td(r.opp); td(vf2(r.me), 'num'); td(vf2(r.oppScore), 'num');
+      td(r.result, r.result === 'Won' ? 'won' : r.result === 'Lost' ? 'lost' : '');
+      if (!self) td(vf2(r.schedScore), 'num dim');
+      tb.append(tr);
+    }
+    const foot = document.createElement('p'); foot.className = 'rb-sub';
+    const own = st.all.find((x) => x.m === a), diff = st.score(sim) - st.score(own);
+    foot.textContent = self ? `Final record: ${recText(sim.rec)}.`
+      : `Revised record: ${recText(sim.rec)}, compared with a real record of ${recText(own.rec)} (${diff > 0 ? '+' + diff + ' wins' : diff < 0 ? diff + ' wins' : 'no change'}).`;
+    t.append(thead, tb); wrap.append(t); el.replaceChildren(h, sub, wrap, foot);
   });
 </script>
 
