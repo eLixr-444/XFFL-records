@@ -32,7 +32,7 @@ def main():
         raise SystemExit(f"Two managers would share the public name {sorted(dupes)}; add them to NAMES in build_public.py.")
 
     os.makedirs(os.path.join(DOCS, "data"), exist_ok=True)
-    for n in ("games", "seasons", "champions"):
+    for n in ("games", "seasons", "champions", "schedule"):
         text = json.dumps(json.load(open(os.path.join(out, n + ".json")))["rows"], separators=(",", ":"))
         for full, s in mapping.items():
             text = text.replace(json.dumps(full)[1:-1], s)

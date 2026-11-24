@@ -2,7 +2,7 @@
 // page runs as a plain public web page. Loads data/*.json, runs the page's
 // calculations and drawings, and redraws on resize and tab changes.
 (function () {
-  const SOURCES = ['games', 'seasons', 'champions'];
+  const SOURCES = ['games', 'seasons', 'champions', 'schedule'];
   const sources = {};          // id -> {status, data}
   const calcs = {};            // id -> {inputs, fn}
   const calcCache = {};        // id -> {status, data}

@@ -8,6 +8,13 @@
   .rb-tabs a { color: var(--color-fg-muted); text-decoration: none; border: 1px solid transparent; border-radius: 999px; padding: 5px 14px; font-size: var(--cds-font-size-body); }
   .rb-tabs a:hover, .rb-tabs a:focus-visible { color: var(--color-fg); border-color: var(--color-border-line); }
   .rb-tabs a.on { color: var(--color-fg); background: var(--color-panel); border-color: var(--color-border-line); font-weight: var(--cds-font-weight-medium); }
+  .rb-groups { display: flex; flex-wrap: wrap; gap: var(--cds-gap-lg); border-bottom: 1px solid var(--color-border-line); }
+  .rb-groups > a, .rb-groups > .off { color: var(--color-fg-muted); text-decoration: none; font-size: var(--cds-font-size-heading); padding: 6px 2px 8px; margin-bottom: -1px; border-bottom: 2px solid transparent; }
+  .rb-groups > a:hover, .rb-groups > a:focus-visible { color: var(--color-fg); }
+  .rb-groups > a:focus-visible { outline: 2px solid var(--color-fg-muted); outline-offset: 2px; }
+  .rb-groups > a.on { color: var(--color-fg); border-bottom-color: var(--color-fg); font-weight: var(--cds-font-weight-medium); }
+  .rb-groups > .off { opacity: 0.45; cursor: not-allowed; }
+  .rb-groups .soon { font-size: var(--cds-font-size-caption); border: 1px solid var(--color-border-line); border-radius: 999px; padding: 0 6px; vertical-align: middle; }
   .rb-page { display: grid; gap: var(--cds-gap-md); }
   .rb-page > h2 { margin: 0; font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); }
   .rb-page > p { margin: 0; color: var(--color-fg-muted); max-width: 72ch; }
@@ -64,8 +71,46 @@
   .rb-t td.lost { color: var(--color-bad); }
   .rb-notes summary { cursor: pointer; color: var(--color-fg-muted); }
   .rb-notes ul { margin: var(--cds-gap-sm) 0 0; padding-left: 20px; color: var(--color-fg-muted); max-width: 72ch; display: grid; gap: 4px; }
+  .rb-proj-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: var(--cds-gap-md); flex: 1 1 460px; min-width: 0; }
+  .rb-proj-tiles .why { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .rb-t tr.me td { font-weight: var(--cds-font-weight-medium); background: color-mix(in srgb, var(--color-fg) 5%, transparent); }
+  .rb-odds { display: grid; gap: 6px; }
+  .rb-odds .row { display: grid; grid-template-columns: 56px minmax(0, 1fr) 56px; gap: var(--cds-gap-sm); align-items: center; font-variant-numeric: tabular-nums; font-size: var(--cds-font-size-caption); }
+  .rb-odds .row .lab { color: var(--color-fg-muted); }
+  .rb-odds .row .pct { text-align: right; }
+  .rb-odds .track { height: 14px; border-radius: 4px; background: color-mix(in srgb, var(--color-fg) 6%, transparent); overflow: hidden; }
+  .rb-odds .fill { height: 100%; background: var(--series-1); border-radius: 4px; }
+  .rb-odds .row.out .fill { background: var(--cds-chart-reference); }
+  .rb-proj-scenhead { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm) var(--cds-gap-md); align-items: center; }
+  .rb-proj-scenhead h3 { margin-right: auto; }
+  .rb-proj-scenhead label { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .rb-picks { display: grid; gap: 6px; }
+  .rb-picks:empty { display: none; }
+  .rb-picks > p { margin: 0; }
+  .rb-pickrow { display: flex; flex-wrap: wrap; gap: 6px var(--cds-gap-md); align-items: center; padding: 4px 0; border-bottom: 1px solid var(--color-border-line); }
+  .rb-pickrow:last-child { border-bottom: 0; }
+  .rb-pickrow .w { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); display: inline-block; min-width: 56px; }
+  .rb-pickrow .dim { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .rb-seg { display: inline-flex; border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); overflow: hidden; }
+  .rb-seg button { font: inherit; font-size: var(--cds-font-size-body); color: var(--color-fg-muted); background: transparent; border: 0; padding: 4px 12px; min-width: 64px; cursor: pointer; }
+  .rb-seg button + button { border-left: 1px solid var(--color-border-line); }
+  .rb-seg button:hover { color: var(--color-fg); }
+  .rb-seg button:focus-visible { outline: 2px solid var(--color-fg-muted); outline-offset: -2px; }
+  .rb-seg button[aria-pressed="true"] { background: color-mix(in srgb, var(--color-fg) 9%, transparent); color: var(--color-fg); font-weight: var(--cds-font-weight-medium); }
+  .rb-seg button.w[aria-pressed="true"] { color: var(--color-ok); }
+  .rb-seg button.l[aria-pressed="true"] { color: var(--color-bad); }
+  .rb-scen { display: grid; gap: var(--cds-gap-md); }
+  .rb-scen > p { margin: 0; color: var(--color-fg-muted); max-width: 72ch; }
+  .rb-scen-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: var(--cds-gap-md); }
+  .rb-scen-list > li { border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-md); display: grid; gap: 6px; align-content: start; }
+  .rb-scen-list .top { display: flex; justify-content: space-between; gap: var(--cds-gap-sm); align-items: center; font-weight: var(--cds-font-weight-medium); }
+  .rb-scen-list .wk { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: var(--cds-gap-sm); }
+  .rb-scen-list .wk .w { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); padding-top: 2px; }
+  .rb-scen-list .wk ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .rb-scen-list .you { font-weight: var(--cds-font-weight-medium); }
+  .rb-scen-list .any { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
   @media print {
-    .rb-tabs, .rb-bar, .rb-btn { display: none; }
+    .rb-groups, .rb-tabs, .rb-bar, .rb-btn { display: none; }
     .rb-page + .rb-page { break-before: page; }
   }
 </style>
@@ -74,15 +119,23 @@
   <header class="rb-head" id="top">
     <h1>The XFFL Record Book Bible</h1>
     <p class="rb-sub">Every XFFL season since 2020. <span data-draw="asOf">—</span> It's Wentz's year.</p>
-    <nav class="rb-tabs" aria-label="Pages">
+    <nav class="rb-groups" aria-label="Sections">
+      <a href="#standings" data-group="records">Records</a>
+      <a href="#revisionist" data-group="sandbox">Sandbox</a>
+      <span class="off" aria-disabled="true" title="Coming soon">Lore <span class="soon">Soon</span></span>
+    </nav>
+    <nav class="rb-tabs" aria-label="Records pages" data-group="records">
       <a href="#standings" data-page="standings">All-time standings</a>
       <a href="#champions" data-page="champions">Champions</a>
       <a href="#games" data-page="games">Single-game records</a>
       <a href="#seasons" data-page="seasons">Season records</a>
       <a href="#h2h" data-page="h2h">Head-to-head</a>
-      <a href="#revisionist" data-page="revisionist">Revisionist machine</a>
       <a href="#facts" data-page="facts">Miscellaneous</a>
       <a href="#recent" data-page="recent">Recent records</a>
+    </nav>
+    <nav class="rb-tabs" aria-label="Sandbox pages" data-group="sandbox" hidden>
+      <a href="#revisionist" data-page="revisionist">Revisionist machine</a>
+      <a href="#projector" data-page="projector">Playoff projector</a>
     </nav>
   </header>
 
@@ -282,6 +335,45 @@
     <div class="rb-card" data-draw="revResult"></div>
   </section>
 
+  <section class="rb-page" id="projector" hidden>
+    <h2>Playoff projector</h2>
+    <p>Pick a manager to see their best possible record, how the rest of the regular season projects, and their odds at every seed. Each game's win chance comes from both teams' scoring this season, weighted toward their last three weeks. Once 4 or fewer weeks are left, it also lists the results that get you each seed.</p>
+    <div class="rb-card">
+      <div class="rb-rev-top">
+        <div class="rb-rev-pick">
+          <label for="proj-team">Manager</label>
+          <select class="dash-select" id="proj-team" data-draw="projTeam" data-source="schedule"></select>
+        </div>
+        <div class="rb-proj-tiles" data-draw="projTiles"></div>
+      </div>
+    </div>
+    <div class="rb-grid">
+      <div class="rb-card"><h3>Remaining schedule</h3><div class="rb-scroll" data-draw="projSched"></div></div>
+      <div class="rb-card"><h3>Seed odds</h3><div data-draw="projOdds"></div></div>
+    </div>
+    <div class="rb-card">
+      <div class="rb-proj-scenhead">
+        <h3>Scenarios</h3>
+        <label for="proj-seed">Target</label>
+        <select class="dash-select" id="proj-seed" data-draw="projSeed"></select>
+      </div>
+      <div class="rb-picks" data-draw="projPicks"></div>
+      <div class="rb-scen" data-draw="projScen"></div>
+    </div>
+    <div class="rb-card"><h3>League outlook</h3><div class="rb-scroll" data-draw="projLeague"></div></div>
+    <details class="rb-notes">
+      <summary>How the projector works</summary>
+      <ul>
+        <li>Projected score = 60% season average + 40% average of the last three weeks. Spread comes from each team's week-to-week swings this season.</li>
+        <li>Win chance for each game compares the two projected scores and spreads. Games are treated as independent.</li>
+        <li>With 4 or fewer weeks left, every combination of wins and losses is checked, so best and worst seeds are exact. Earlier in the season, the odds come from 20,000 simulated seasons.</li>
+        <li>Seeding follows the league's rule, applied by hand at the end of the regular season (ESPN's own seeds can differ): record first, then head-to-head record among the tied teams, then total points scored. A game with a tied score counts as the win or loss ESPN gave it (bench points decide it). Points in future weeks are projected, so a scenario that ends in a points tiebreaker could still go the other way.</li>
+        <li>Scenarios list the fewest results needed; any game not listed can go either way. Pick wins or losses for your own games to narrow them down. The 6 most likely are shown.</li>
+        <li>Strength of schedule blends each remaining opponent's win %, season scoring average and last-3-week average, so it changes every week. 1st is the easiest schedule left.</li>
+      </ul>
+    </details>
+  </section>
+
   <section class="rb-page" id="facts" hidden>
     <h2>Miscellaneous</h2>
     <p>Luck, bench warmers and fun facts from every game and season in the record book.</p>
@@ -359,8 +451,8 @@
       const out = [];
       for (const g of games) {
         const hs = +g.home_score, as = +g.away_score;
-        out.push({ id: g.id + '-h', game: g.id, season: +g.season, week: +g.week, kind: g.kind, manager: g.home, team: g.home_team, score: hs, opponent: g.away, opp_score: as, bench: g.home_bench == null ? null : +g.home_bench, result: hs > as ? 'Won' : hs < as ? 'Lost' : 'Tied' });
-        out.push({ id: g.id + '-a', game: g.id, season: +g.season, week: +g.week, kind: g.kind, manager: g.away, team: g.away_team, score: as, opponent: g.home, opp_score: hs, bench: g.away_bench == null ? null : +g.away_bench, result: as > hs ? 'Won' : as < hs ? 'Lost' : 'Tied' });
+        out.push({ id: g.id + '-h', game: g.id, season: +g.season, week: +g.week, kind: g.kind, manager: g.home, team: g.home_team, score: hs, opponent: g.away, opp_score: as, bench: g.home_bench == null ? null : +g.home_bench, result: hs > as || (hs === as && g.winner === 'home') ? 'Won' : hs < as || (hs === as && g.winner === 'away') ? 'Lost' : 'Tied' });
+        out.push({ id: g.id + '-a', game: g.id, season: +g.season, week: +g.week, kind: g.kind, manager: g.away, team: g.away_team, score: as, opponent: g.home, opp_score: hs, bench: g.away_bench == null ? null : +g.away_bench, result: as > hs || (hs === as && g.winner === 'away') ? 'Won' : as < hs || (hs === as && g.winner === 'home') ? 'Lost' : 'Tied' });
       }
       return out;
     },
@@ -478,15 +570,18 @@
     title: 'Head-to-head records', description: 'Wins, losses and points for every pair of managers, playoffs included.', inputs: ['games'],
     fn: (games) => {
       const by = new Map();
-      const add = (a, b, as, bs, kind) => {
+      const add = (a, b, as, bs, kind, aWon) => {
         const id = a + '|' + b;
         const r = by.get(id) || { id, a, b, games: 0, a_wins: 0, b_wins: 0, ties: 0, a_points: 0, b_points: 0, playoff_games: 0 };
         r.games++; r.a_points += as; r.b_points += bs;
-        if (as > bs) r.a_wins++; else if (bs > as) r.b_wins++; else r.ties++;
+        if (as > bs || (as === bs && aWon === true)) r.a_wins++; else if (bs > as || (as === bs && aWon === false)) r.b_wins++; else r.ties++;
         if (kind !== 'Regular season') r.playoff_games++;
         by.set(id, r);
       };
-      for (const g of games) { const hs = +g.home_score, as = +g.away_score; add(g.home, g.away, hs, as, g.kind); add(g.away, g.home, as, hs, g.kind); }
+      for (const g of games) {
+        const hs = +g.home_score, as = +g.away_score, hw = g.winner === 'home' ? true : g.winner === 'away' ? false : null;
+        add(g.home, g.away, hs, as, g.kind, hw); add(g.away, g.home, as, hs, g.kind, hw === null ? null : !hw);
+      }
       return [...by.values()].map((r) => ({ ...r, a_points: Math.round(r.a_points * 100) / 100, b_points: Math.round(r.b_points * 100) / 100,
         a_avg: Math.round((r.a_points / r.games) * 100) / 100, b_avg: Math.round((r.b_points / r.games) * 100) / 100 }));
     },
@@ -624,7 +719,7 @@
       const benchLoss = teamGames.filter((r) => r.result === 'Lost' && r.bench != null && r.bench > r.opp_score - r.score).sort((a, b) => b.bench - a.bench);
       if (benchLoss[0]) add('bench-loss', 'Coaching', `${benchLoss[0].manager} lost by ${p(benchLoss[0].opp_score - benchLoss[0].score)} in ${when(benchLoss[0])} with ${p(benchLoss[0].bench)} points sitting on the bench.`);
       add('bench-total', 'Coaching', `Across the league, ${p(d3.sum(teamGames, (r) => r.bench || 0))} points have been left on benches in regular-season games.`);
-      const ties = teamGames.filter((r) => r.result === 'Tied' && r.id.endsWith('-h'));
+      const ties = teamGames.filter((r) => r.score === r.opp_score && r.id.endsWith('-h'));
       if (ties.length) add('ties', 'Oddities', `The league has had ${ties.length} tie${ties.length === 1 ? '' : 's'}, most recently ${ties[ties.length - 1].manager} and ${ties[ties.length - 1].opponent} at ${p(ties[ties.length - 1].score)} in ${when(ties[ties.length - 1])}.`);
       const twMax = d3.max(alltime, (m) => m.ten_win), twAll = alltime.filter((m) => m.ten_win === twMax).map((m) => m.manager);
       if (twMax) add('ten-win', 'Consistency', `${twAll.join(' and ')} ${twAll.length === 1 ? 'has' : 'share'} the most 10-win seasons with ${twMax}${twAll.length === 1 ? '' : ' each'}.`);
@@ -721,6 +816,15 @@
     if (!all.length) return;
     const target = all.find((p) => p.id === id) ? id : all[0].id;
     all.forEach((p) => { p.hidden = p.id !== target; });
+    const link = document.querySelector('.rb-tabs a[data-page="' + target + '"]');
+    const group = link ? link.closest('.rb-tabs').getAttribute('data-group') : 'records';
+    lastIn[group] = target;
+    document.querySelectorAll('.rb-tabs[data-group]').forEach((n) => { n.hidden = n.getAttribute('data-group') !== group; });
+    document.querySelectorAll('.rb-groups a[data-group]').forEach((a) => {
+      const on = a.getAttribute('data-group') === group;
+      a.classList.toggle('on', on);
+      if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+    });
     document.querySelectorAll('.rb-tabs a[data-page]').forEach((a) => {
       const on = a.getAttribute('data-page') === target;
       a.classList.toggle('on', on);
@@ -728,6 +832,15 @@
     });
     dash.setLink(target === all[0].id ? null : target);
   };
+  // Remember the last page opened in each section, so switching back returns to it.
+  const lastIn = {};
+  document.querySelectorAll('.rb-groups a[data-group]').forEach((a) => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const g = a.getAttribute('data-group'), first = document.querySelector('.rb-tabs[data-group="' + g + '"] a[data-page]');
+      show(lastIn[g] || (first && first.getAttribute('data-page')));
+    });
+  });
   document.querySelectorAll('.rb-tabs a[data-page]').forEach((a) => {
     a.addEventListener('click', (e) => { e.preventDefault(); show(a.getAttribute('data-page')); });
   });
@@ -934,7 +1047,8 @@
       const aS = g.home === st.a ? +g.home_score : +g.away_score, bS = g.home === st.a ? +g.away_score : +g.home_score;
       const tr = document.createElement('tr'); tr.setAttribute('data-key', henc(g.id));
       const c1 = document.createElement('td'); c1.className = 'dim'; c1.textContent = hwhen({ season: g.season, week: g.week }); hchip(c1, g.kind);
-      const c2 = document.createElement('td'); c2.textContent = aS > bS ? st.a : bS > aS ? st.b : 'Tie';
+      const aWin = g.winner === (g.home === st.a ? 'home' : 'away'), bWin = g.winner === (g.home === st.a ? 'away' : 'home');
+      const c2 = document.createElement('td'); c2.textContent = aS > bS || (aS === bS && aWin) ? st.a : bS > aS || (aS === bS && bWin) ? st.b : 'Tie';
       const c3 = document.createElement('td'); c3.className = 'num'; c3.textContent = hf2(aS);
       const c4 = document.createElement('td'); c4.className = 'num'; c4.textContent = hf2(bS);
       tr.append(c1, c2, c3, c4); tb.append(tr);
@@ -1042,6 +1156,461 @@
     foot.textContent = self ? `Final record: ${recText(sim.rec)}.`
       : `Revised record: ${recText(sim.rec)}, compared with a real record of ${recText(own.rec)} (${diff > 0 ? '+' + diff + ' wins' : diff < 0 ? diff + ' wins' : 'no change'}).`;
     t.append(thead, tb); wrap.append(t); el.replaceChildren(h, sub, wrap, foot);
+  });
+</script>
+
+<script>
+  // ---------- Playoff projector ----------
+  const { f2: pf2 } = window.rb;
+  window.rbProj = window.rbProj || { team: null, target: null, showAll: false, key: null, model: null, res: null, busy: false };
+  const pj = window.rbProj;
+  const EXACT_WEEKS = 4, EXACT_MAX_GAMES = 22, SIMS = 20000;
+  const PROJ_DRAWS = ['projTeam', 'projTiles', 'projSched', 'projOdds', 'projSeed', 'projPicks', 'projScen', 'projLeague'];
+  const redrawProj = () => PROJ_DRAWS.forEach((n) => dash.draw(n));
+  const pct = (p) => (p >= 1 - 1e-9 ? '100%' : p >= 0.999 ? '>99.9%' : p > 0 && p < 0.0001 ? '<0.01%' : (p * 100).toFixed(p < 0.001 ? 2 : p < 0.1 ? 1 : 0) + '%');
+  const ord = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th');
+  const recStr = (w, l, t) => w + '-' + l + (t ? '-' + t : '');
+  const normCdf = (z) => {
+    const t = 1 / (1 + 0.2316419 * Math.abs(z)), d = 0.3989423 * Math.exp(-z * z / 2);
+    const p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+    return z > 0 ? 1 - p : p;
+  };
+  const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+
+  // Everything known before any simulating: records, head-to-head so far, projections, remaining games.
+  const buildModel = () => {
+    const g = dash.data('games'), sc = dash.data('schedule');
+    if (g.status !== 'ok') return { status: g.status };
+    if (sc.status !== 'ok') return { status: sc.status === 'missing' ? 'nodata' : sc.status };
+    if (!sc.data.length) return { status: 'none' };
+    const season = d3.max(sc.data, (r) => +r.season);
+    const left = sc.data.filter((r) => +r.season === season).sort((a, b) => +a.week - +b.week);
+    const played = g.data.filter((r) => +r.season === season && r.kind === 'Regular season');
+    const teams = [...new Set([...played, ...left].flatMap((r) => [r.home, r.away]))].sort((a, b) => a.localeCompare(b));
+    const n = teams.length, ix = new Map(teams.map((t, i) => [t, i]));
+    const W = new Float64Array(n), L = new Array(n).fill(0), T = new Array(n).fill(0), PF = new Float64Array(n);
+    const H = new Float64Array(n * n), GP = new Float64Array(n * n), scores = teams.map(() => []);
+    for (const r of played) {
+      const a = ix.get(r.home), b = ix.get(r.away), sa = +r.home_score, sb = +r.away_score;
+      PF[a] += sa; PF[b] += sb; scores[a].push([+r.week, sa]); scores[b].push([+r.week, sb]);
+      GP[a * n + b]++; GP[b * n + a]++;
+      const hw = sa > sb || (sa === sb && r.winner === 'home'), aw = sb > sa || (sa === sb && r.winner === 'away');
+      if (hw) { W[a]++; L[b]++; H[a * n + b]++; } else if (aw) { W[b]++; L[a]++; H[b * n + a]++; }
+      else { W[a] += 0.5; W[b] += 0.5; T[a]++; T[b]++; H[a * n + b] += 0.5; H[b * n + a] += 0.5; }
+    }
+    const mu = new Float64Array(n), sd = new Float64Array(n), avgs = new Float64Array(n), lasts = new Float64Array(n);
+    scores.forEach((list, i) => {
+      const v = list.sort((x, y) => x[0] - y[0]).map((x) => x[1]);
+      const avg = v.length ? d3.mean(v) : 100, last = v.length ? d3.mean(v.slice(-3)) : avg;
+      avgs[i] = avg; lasts[i] = last;
+      mu[i] = 0.6 * avg + 0.4 * last;
+      sd[i] = Math.min(40, Math.max(12, v.length > 2 ? d3.deviation(v) : 25));
+    });
+    const games = left.map((r) => {
+      const a = ix.get(r.home), b = ix.get(r.away);
+      return { id: r.id, week: +r.week, a, b, p: normCdf((mu[a] - mu[b]) / Math.sqrt(sd[a] ** 2 + sd[b] ** 2)) };
+    });
+    const projPF = Float64Array.from(PF, (v, i) => v + mu[i] * games.filter((x) => x.a === i || x.b === i).length);
+    // Remaining games between each pair, for head-to-head tiebreakers.
+    const pairs = teams.map(() => teams.map(() => []));
+    games.forEach((x, k) => { pairs[x.a][x.b].push(k); pairs[x.b][x.a].push(k); });
+    const weeks = [...new Set(games.map((x) => x.week))];
+    // Strength of schedule: each opponent's win %, season average and last-3 average, scaled across the
+    // league and blended equally, then averaged over the games a team has left. 1st = easiest.
+    const wpct = Float64Array.from(W, (w, i) => w / Math.max(1, w + L[i] + T[i] / 2));
+    const z = (arr) => { const m = d3.mean(arr), s = d3.deviation(arr) || 1; return Array.from(arr, (v) => (v - m) / s); };
+    const zw = z(wpct), za = z(avgs), zl = z(lasts), str = teams.map((_, i) => (zw[i] + za[i] + zl[i]) / 3);
+    const sos = teams.map((_, i) => {
+      const opp = games.filter((x) => x.a === i || x.b === i).map((x) => (x.a === i ? x.b : x.a));
+      return opp.length ? { v: d3.mean(opp, (o) => str[o]), wp: d3.mean(opp, (o) => wpct[o]), avg: d3.mean(opp, (o) => avgs[o]), games: opp.length } : null;
+    });
+    const sosOrder = teams.map((_, i) => i).filter((i) => sos[i]).sort((a, b) => sos[a].v - sos[b].v);
+    sosOrder.forEach((i, r) => { sos[i].rank = r + 1; sos[i].of = sosOrder.length; });
+    const M = {
+      status: 'ok', season, teams, n, ix, W, L, T, PF, H, GP, mu, sd, games, projPF, pairs, weeks, sos,
+      playoffTeams: +left[0].playoff_teams || 6, regWeeks: +left[0].reg_weeks || 14,
+      exact: weeks.length <= EXACT_WEEKS && games.length <= EXACT_MAX_GAMES,
+    };
+    // Seeds are set by hand at season's end with the league rule, not ESPN's, so "current seed" uses the same rule on games played so far.
+    M.seedOf = new Map([...ranker(M)(W, PF, () => null)].map((t, i) => [teams[t], i + 1]));
+    return M;
+  };
+
+  // Seed order for one finished season. win(k) says whether the home team won remaining game k.
+  const ranker = (M) => {
+    const { n, H, GP, pairs, games } = M, o = new Int32Array(n), grp = [], key = new Float64Array(n);
+    return (w, pf, win) => {
+      for (let i = 0; i < n; i++) o[i] = i;
+      for (let i = 1; i < n; i++) {
+        const x = o[i]; let j = i - 1;
+        while (j >= 0 && (w[o[j]] < w[x] || (w[o[j]] === w[x] && pf[o[j]] < pf[x]))) { o[j + 1] = o[j]; j--; }
+        o[j + 1] = x;
+      }
+      for (let i = 0; i < n;) {
+        let j = i + 1;
+        while (j < n && w[o[j]] === w[o[i]]) j++;
+        if (j - i > 1) {
+          grp.length = 0;
+          for (let q = i; q < j; q++) grp.push(o[q]);
+          for (const a of grp) {
+            let ww = 0, gp = 0;
+            for (const b of grp) {
+              if (b === a) continue;
+              ww += H[a * n + b]; gp += GP[a * n + b];
+              for (const k of pairs[a][b]) { const r = win(k); if (r === null) continue; gp++; if ((games[k].a === a) === !!r) ww++; }
+            }
+            key[a] = gp ? ww / gp : 0.5;
+          }
+          grp.sort((x, y) => key[y] - key[x] || pf[y] - pf[x]);
+          for (let q = i; q < j; q++) o[q] = grp[q - i];
+        }
+        i = j;
+      }
+      return o;
+    };
+  };
+
+  // With few games left: every outcome, weighted by its chance.
+  const runExact = (M) => {
+    const { n, games, W, projPF } = M, G = games.length, N = 1 << G;
+    const seeds = new Uint8Array(N * n), prob = new Float64Array(N);
+    prob[0] = 1;
+    for (let k = 0; k < G; k++) {
+      const p = games[k].p, half = 1 << k;
+      for (let m = 0; m < half; m++) { prob[m | half] = prob[m] * p; prob[m] *= 1 - p; }
+    }
+    const rank = ranker(M), w = new Float64Array(n);
+    let mask = 0; const win = (k) => (mask >> k) & 1;
+    for (mask = 0; mask < N; mask++) {
+      w.set(W);
+      for (let k = 0; k < G; k++) w[(mask >> k) & 1 ? games[k].a : games[k].b]++;
+      const o = rank(w, projPF, win), base = mask * n;
+      for (let s = 0; s < n; s++) seeds[base + o[s]] = s + 1;
+    }
+    const odds = M.teams.map(() => new Float64Array(n + 1)), best = new Array(n).fill(n), worst = new Array(n).fill(1);
+    for (let m = 0; m < N; m++) {
+      const base = m * n, p = prob[m];
+      for (let t = 0; t < n; t++) {
+        const s = seeds[base + t]; odds[t][s] += p;
+        if (s < best[t]) best[t] = s; if (s > worst[t]) worst[t] = s;
+      }
+    }
+    return { exact: true, seeds, prob, odds, best, worst, N };
+  };
+
+  // Further out: simulate the rest of the season many times, scores and all.
+  const runSims = (M) => {
+    const { n, games, W, PF, mu, sd } = M, rank = ranker(M), w = new Float64Array(n), pf = new Float64Array(n);
+    const res = new Uint8Array(games.length), win = (k) => res[k] === 1;
+    const odds = M.teams.map(() => new Float64Array(n + 1)), best = new Array(n).fill(n), worst = new Array(n).fill(1);
+    for (let s = 0; s < SIMS; s++) {
+      w.set(W); pf.set(PF);
+      games.forEach((x, k) => {
+        const sa = mu[x.a] + sd[x.a] * gauss(), sb = mu[x.b] + sd[x.b] * gauss();
+        pf[x.a] += sa; pf[x.b] += sb; res[k] = sa > sb ? 1 : 0; w[sa > sb ? x.a : x.b]++;
+      });
+      const o = rank(w, pf, win);
+      for (let i = 0; i < n; i++) {
+        const t = o[i], seed = i + 1; odds[t][seed] += 1 / SIMS;
+        if (seed < best[t]) best[t] = seed; if (seed > worst[t]) worst[t] = seed;
+      }
+    }
+    return { exact: false, odds, best, worst };
+  };
+
+  // The state every projector drawing reads. Heavy work runs once per data load, off the first paint.
+  const projState = () => {
+    const g = dash.data('games'), sc = dash.data('schedule');
+    const key = g.status + ':' + (g.data || []).length + ':' + sc.status + ':' + (sc.data || []).length;
+    if (pj.key !== key) { pj.key = key; pj.model = buildModel(); pj.res = null; pj.busy = false; pj.picks = {}; }
+    const M = pj.model;
+    if (M.status !== 'ok') return { M };
+    if (!M.teams.includes(pj.team)) pj.team = M.teams[0];
+    if (!pj.res && !pj.busy) {
+      pj.busy = true;
+      setTimeout(() => {
+        const t0 = performance.now();
+        try { pj.res = M.exact ? runExact(M) : runSims(M); } catch (e) { console.error('Projector failed', e); pj.res = { error: String(e) }; }
+        pj.ms = performance.now() - t0; pj.busy = false; redrawProj();
+      }, 30);
+    }
+    return { M, R: pj.res };
+  };
+  const projMsg = (M) => ({
+    loading: 'Loading…', error: 'Failed to load', nodata: 'The schedule data is not available here yet.',
+    none: 'No regular-season games are left. The projector comes back when next season starts.',
+  })[M.status] || '—';
+  const say = (el, text) => { const p = document.createElement('p'); p.className = 'rb-sub'; p.textContent = text; el.replaceChildren(p); };
+  const myGames = (M, t) => M.games.map((x, k) => ({ ...x, k })).filter((x) => x.a === t || x.b === t);
+
+  dash.draw('projTeam', (sel) => {
+    const { M } = projState();
+    if (M.status !== 'ok') { sel.replaceChildren(new Option(M.status === 'loading' ? 'Loading…' : '—', '')); return; }
+    sel.replaceChildren(...M.teams.map((t) => new Option(t, t)));
+    sel.value = pj.team;
+    sel.onchange = () => { pj.team = sel.value; pj.target = null; pj.picks = {}; redrawProj(); };
+  });
+
+  dash.draw('projTiles', (el) => {
+    const { M, R } = projState();
+    if (M.status !== 'ok') { say(el, projMsg(M)); return; }
+    const t = M.ix.get(pj.team), mine = myGames(M, t);
+    const ew = d3.sum(mine, (x) => (x.a === t ? x.p : 1 - x.p));
+    const tile = (label, text, why) => {
+      const d = document.createElement('div'); d.className = 'rb-tile';
+      const k = document.createElement('span'); k.className = 'k'; k.textContent = label;
+      const v = document.createElement('span'); v.className = 'v'; v.textContent = text;
+      d.append(k, v);
+      if (why) { const w = document.createElement('span'); w.className = 'why'; w.textContent = why; d.append(w); }
+      return d;
+    };
+    const wins = M.W[t] - M.T[t] / 2, cur = M.seedOf.get(pj.team);
+    const pw = Math.round(wins + ew), out = [
+      tile('Current record', recStr(wins, M.L[t], M.T[t]), cur ? ord(cur) + ' seed now' : ''),
+      tile('Best possible record', recStr(wins + mine.length, M.L[t], M.T[t]), mine.length ? 'Winning all ' + mine.length + ' left' : 'Season over'),
+      tile('Projected record', recStr(pw, M.L[t] + mine.length - (pw - wins), M.T[t]), (wins + ew).toFixed(1) + ' expected wins'),
+    ];
+    if (R && !R.error) {
+      const po = d3.sum(R.odds[t].slice(1, M.playoffTeams + 1));
+      out.push(tile('Playoff odds', pct(po), R.exact && R.worst[t] <= M.playoffTeams ? 'Clinched' : R.exact && R.best[t] > M.playoffTeams ? 'Eliminated' : 'Top ' + M.playoffTeams + ' make it'));
+      out.push(tile(R.exact ? 'Best possible seed' : 'Best seed reached', ord(R.best[t]), R.exact ? 'Worst possible: ' + ord(R.worst[t]) : 'In ' + SIMS.toLocaleString() + ' sims'));
+    } else out.push(tile('Playoff odds', R && R.error ? 'Error' : '…', R && R.error ? '' : 'Crunching'));
+    const ss = M.sos[t];
+    if (ss) {
+      const d = tile('Strength of schedule', ord(ss.rank), `Of ${ss.of}, 1st is easiest. Opponents win ${Math.round(ss.wp * 100)}%, avg ${ss.avg.toFixed(1)}`);
+      const heat = ss.of > 1 ? Math.round(((ss.rank - 1) / (ss.of - 1)) * 100) : 0;
+      d.querySelector('.v').style.color = `color-mix(in srgb, var(--color-bad) ${heat}%, var(--color-fg))`;
+      d.title = 'Based on remaining opponents\' records, season scoring average and last-3-week average';
+      out.push(d);
+    }
+    el.replaceChildren(...out);
+  });
+
+  dash.draw('projSched', (el) => {
+    const { M } = projState();
+    if (M.status !== 'ok') { say(el, projMsg(M)); return; }
+    const t = M.ix.get(pj.team), mine = myGames(M, t);
+    if (!mine.length) { say(el, 'No games left.'); return; }
+    const tbl = document.createElement('table'); tbl.className = 'rb-t'; tbl.setAttribute('data-source', 'schedule'); tbl.setAttribute('data-row-key', 'id');
+    const hr = document.createElement('tr');
+    [['Week', 'num'], ['Opponent'], ['Opp. record', 'num'], ['Proj.', 'num'], ['Opp. proj.', 'num'], ['Win chance', 'num']].forEach(([h, c]) => {
+      const th = document.createElement('th'); th.textContent = h; if (c) th.className = c; hr.append(th);
+    });
+    const thead = document.createElement('thead'); thead.append(hr);
+    const tb = document.createElement('tbody');
+    for (const x of mine) {
+      const o = x.a === t ? x.b : x.a, p = x.a === t ? x.p : 1 - x.p;
+      const tr = document.createElement('tr'); tr.setAttribute('data-key', encodeURIComponent(x.id));
+      const td = (txt, cls) => { const c = document.createElement('td'); c.textContent = txt; if (cls) c.className = cls; tr.append(c); };
+      td(String(x.week), 'num dim'); td(M.teams[o]); td(recStr(M.W[o] - M.T[o] / 2, M.L[o], M.T[o]), 'num dim');
+      td(pf2(M.mu[t]), 'num'); td(pf2(M.mu[o]), 'num'); td(pct(p), 'num ' + (p >= 0.5 ? 'won' : 'lost'));
+      tb.append(tr);
+    }
+    tbl.append(thead, tb); el.replaceChildren(tbl);
+  });
+
+  dash.draw('projOdds', (el) => {
+    const { M, R } = projState();
+    if (M.status !== 'ok') { say(el, projMsg(M)); return; }
+    if (!R) { say(el, M.exact ? 'Checking all ' + (2 ** M.games.length).toLocaleString() + ' ways the season can end…' : 'Simulating the rest of the season…'); return; }
+    if (R.error) { say(el, 'Could not run the projection.'); return; }
+    const t = M.ix.get(pj.team), wrap = document.createElement('div'); wrap.className = 'rb-odds';
+    wrap.setAttribute('role', 'list'); wrap.setAttribute('aria-label', 'Chance of finishing at each seed');
+    for (let s = 1; s <= M.n; s++) {
+      const p = R.odds[t][s], row = document.createElement('div'); row.className = 'row' + (s > M.playoffTeams ? ' out' : ''); row.setAttribute('role', 'listitem');
+      const lab = document.createElement('span'); lab.className = 'lab'; lab.textContent = ord(s) + (s === M.playoffTeams ? ' ·' : '');
+      const track = document.createElement('div'); track.className = 'track';
+      const fill = document.createElement('div'); fill.className = 'fill'; fill.style.width = (p * 100).toFixed(2) + '%'; track.append(fill);
+      const v = document.createElement('span'); v.className = 'pct'; v.textContent = p ? pct(p) : '—';
+      row.append(lab, track, v); wrap.append(row);
+    }
+    const note = document.createElement('p'); note.className = 'rb-sub';
+    note.textContent = (R.exact ? 'Exact odds across all ' + R.N.toLocaleString() + ' outcomes. ' : 'From ' + SIMS.toLocaleString() + ' simulated seasons. ') + 'Seeds 1-' + M.playoffTeams + ' make the playoffs.';
+    el.replaceChildren(wrap, note);
+  });
+
+  // ---------- Scenarios: which results get the chosen team to a seed ----------
+  const targets = (M, R, t) => {
+    const list = [];
+    if (!R || R.error) return list;
+    for (let s = R.best[t]; s <= Math.min(R.worst[t], M.playoffTeams); s++) if (R.odds[t][s] > 0) list.push({ v: String(s), label: ord(s) + ' seed', test: (x) => x === s });
+    if (R.best[t] <= M.playoffTeams) list.push({ v: 'po', label: 'Any playoff spot', test: (x) => x <= M.playoffTeams });
+    return list;
+  };
+  // Shortest result lists that lock in the target: a reduced decision diagram over the games that matter.
+  // `fixed` holds results the user picked ({k: homeWins}); outcomes that disagree are left out and odds are given those picks.
+  const findScenarios = (M, R, t, test, fixed) => {
+    const G = M.games.length, N = R.N, n = M.n, hit = new Uint8Array(N);
+    let fixMask = 0, fixVal = 0, pFix = 1, total = 0;
+    for (const [k, hw] of Object.entries(fixed || {})) { fixMask |= 1 << k; if (hw) fixVal |= 1 << k; pFix *= hw ? M.games[k].p : 1 - M.games[k].p; }
+    for (let m = 0; m < N; m++) if ((m & fixMask) === fixVal && test(R.seeds[m * n + t])) { hit[m] = 1; total += R.prob[m]; }
+    total /= pFix;
+    const infl = [];
+    for (let k = 0; k < G; k++) {
+      const bit = 1 << k; let c = 0;
+      for (let m = 0; m < N; m++) if (!(m & bit) && hit[m] !== hit[m | bit]) c++;
+      if (c) infl.push({ k, c, mine: M.games[k].a === t || M.games[k].b === t });
+    }
+    if (!infl.length) return { total, always: hit[0] === 1, never: hit[0] === 0, list: [] };
+    infl.sort((x, y) => y.c - x.c || y.mine - x.mine || M.games[x.k].week - M.games[y.k].week);
+    const order = infl.map((x) => x.k), r = order.length, size = 1 << r;
+    // Games outside `order` never change the answer, so read them as home losses.
+    let cur = new Int32Array(size);
+    for (let i = 0; i < size; i++) {
+      let m = 0;
+      for (let q = 0; q < r; q++) if ((i >> (r - 1 - q)) & 1) m |= 1 << order[q];
+      cur[i] = hit[m];
+    }
+    const nodes = [null, null];
+    for (let q = r - 1; q >= 0; q--) {
+      const next = new Int32Array(cur.length >> 1), uniq = new Map();
+      for (let i = 0; i < next.length; i++) {
+        const lo = cur[2 * i], hi = cur[2 * i + 1];
+        if (lo === hi) { next[i] = lo; continue; }
+        const key = lo * 4194304 + hi;
+        let id = uniq.get(key);
+        if (id === undefined) { id = nodes.length; nodes.push({ k: order[q], lo, hi }); uniq.set(key, id); }
+        next[i] = id;
+      }
+      cur = next;
+    }
+    const root = cur[0], list = [], CAP = 20000;
+    let more = false;
+    const walk = (id, conds, p) => {
+      if (list.length >= CAP) { more = true; return; }
+      if (id === 0) return;
+      if (id === 1) { list.push({ conds: conds.slice(), p }); return; }
+      const nd = nodes[id], fx = (fixMask >> nd.k) & 1;
+      if (fx) { walk((fixVal >> nd.k) & 1 ? nd.hi : nd.lo, conds, p); return; }
+      const gp = M.games[nd.k].p;
+      conds.push({ k: nd.k, homeWins: true }); walk(nd.hi, conds, p * gp); conds.pop();
+      conds.push({ k: nd.k, homeWins: false }); walk(nd.lo, conds, p * (1 - gp)); conds.pop();
+    };
+    walk(root, [], 1);
+    list.sort((x, y) => y.p - x.p || x.conds.length - y.conds.length);
+    return { total, always: root === 1, never: root === 0, list, more };
+  };
+
+  dash.draw('projSeed', (sel) => {
+    const { M, R } = projState();
+    const t = M.status === 'ok' ? M.ix.get(pj.team) : null;
+    const opts = M.status === 'ok' && M.exact ? targets(M, R, t) : [];
+    sel.disabled = !opts.length;
+    if (!opts.length) { sel.replaceChildren(new Option(M.status === 'ok' && M.exact && !R ? 'Loading…' : '—', '')); return; }
+    if (!opts.some((o) => o.v === pj.target)) pj.target = opts[0].v;
+    sel.replaceChildren(...opts.map((o) => new Option(o.label, o.v)));
+    sel.value = pj.target;
+    sel.onchange = () => { pj.target = sel.value; dash.draw('projScen'); };
+  });
+
+  const myPicks = (M, t) => {
+    const fixed = {};
+    for (const x of myGames(M, t)) if (pj.picks && x.k in pj.picks) fixed[x.k] = (x.a === t) === pj.picks[x.k];
+    return fixed;
+  };
+  dash.draw('projPicks', (el) => {
+    const { M, R } = projState();
+    if (M.status !== 'ok' || !M.exact || !R || R.error) { el.replaceChildren(); return; }
+    const t = M.ix.get(pj.team), mine = myGames(M, t);
+    if (!mine.length) { el.replaceChildren(); return; }
+    pj.picks = pj.picks || {};
+    const head = document.createElement('p'); head.className = 'rb-sub'; head.textContent = 'Pick who wins, or leave them as either:';
+    const rows = mine.map((x) => {
+      const o = x.a === t ? x.b : x.a, p = x.a === t ? x.p : 1 - x.p, row = document.createElement('div'); row.className = 'rb-pickrow';
+      const wk = document.createElement('span'); wk.className = 'w'; wk.textContent = 'Week ' + x.week;
+      const ch = document.createElement('span'); ch.className = 'dim'; ch.textContent = pct(p) + ' to win';
+      const seg = document.createElement('div'); seg.className = 'rb-seg'; seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'Week ' + x.week + ' winner, ' + pj.team + ' vs ' + M.teams[o]);
+      const cur = x.k in pj.picks ? (pj.picks[x.k] ? 'w' : 'l') : 'e';
+      [['w', pj.team], ['e', 'Either'], ['l', M.teams[o]]].forEach(([v, txt]) => {
+        const b = document.createElement('button'); b.type = 'button'; b.className = v; b.textContent = txt;
+        b.setAttribute('aria-pressed', String(cur === v));
+        b.onclick = () => { if (v === 'e') delete pj.picks[x.k]; else pj.picks[x.k] = v === 'w'; dash.draw('projPicks'); dash.draw('projScen'); };
+        seg.append(b);
+      });
+      row.append(wk, seg, ch); return row;
+    });
+    el.replaceChildren(head, ...rows);
+  });
+
+  dash.draw('projScen', (el) => {
+    const { M, R } = projState();
+    if (M.status !== 'ok') { say(el, projMsg(M)); return; }
+    if (!M.exact) { say(el, `Scenarios show up once ${EXACT_WEEKS} or fewer weeks are left in the regular season. There are ${M.weeks.length} weeks left, too many outcomes to list. Seed odds above are simulated for now.`); return; }
+    if (!R) { say(el, 'Working out scenarios…'); return; }
+    if (R.error) { say(el, 'Could not work out scenarios.'); return; }
+    const t = M.ix.get(pj.team), opt = targets(M, R, t).find((o) => o.v === pj.target);
+    if (!opt) { say(el, `${pj.team} can't make the playoffs from here. Every remaining outcome leaves them ${ord(R.best[t])} or lower.`); return; }
+    const fixed = myPicks(M, t), picked = Object.keys(fixed).length > 0;
+    const sc = findScenarios(M, R, t, opt.test, fixed), goal = opt.v === 'po' ? 'a playoff spot' : 'the ' + opt.label;
+    const lead = document.createElement('p'), pre = picked ? 'With your picks, ' : '';
+    if (sc.always) { lead.textContent = picked ? `With your picks, ${pj.team} locks up ${goal} no matter what else happens.` : `${pj.team} has clinched ${goal}. Nothing that happens from here changes it.`; el.replaceChildren(lead); return; }
+    if (sc.never || !sc.list.length) { lead.textContent = picked ? `With your picks, ${pj.team} can't get ${goal}. Try changing a result above.` : `${pj.team} can't get ${goal}.`; el.replaceChildren(lead); return; }
+    const cnt = sc.list.length, show = sc.list.slice(0, 6);
+    lead.textContent = `${pre}${pj.team} gets ${goal} in ${sc.more ? 'more than ' : ''}${cnt.toLocaleString()} scenario${cnt === 1 ? '' : 's'}, ${pct(sc.total)} likely in all.` +
+      (cnt > show.length ? ` Showing the ${show.length} most likely.` : '') + ' Any game not listed can go either way.';
+    const ol = document.createElement('ol'); ol.className = 'rb-scen-list';
+    show.forEach((s, i) => {
+      const li = document.createElement('li');
+      const top = document.createElement('div'); top.className = 'top';
+      const nm = document.createElement('span'); nm.textContent = 'Scenario ' + (i + 1);
+      const ch = document.createElement('span'); ch.className = 'rb-chip'; ch.textContent = pct(s.p) + ' likely';
+      top.append(nm, ch); li.append(top);
+      const byWeek = d3.group(s.conds.slice().sort((x, y) => M.games[x.k].week - M.games[y.k].week), (c) => M.games[c.k].week);
+      for (const [wk, cs] of byWeek) {
+        const row = document.createElement('div'); row.className = 'wk';
+        const w = document.createElement('span'); w.className = 'w'; w.textContent = 'Week ' + wk;
+        const ul = document.createElement('ul');
+        cs.sort((x, y) => (M.games[y.k].a === t || M.games[y.k].b === t) - (M.games[x.k].a === t || M.games[x.k].b === t)).forEach((c) => {
+          const g = M.games[c.k], win = c.homeWins ? g.a : g.b, lose = c.homeWins ? g.b : g.a, li2 = document.createElement('li');
+          if (win === t) { li2.className = 'you'; li2.textContent = 'You beat ' + M.teams[lose]; }
+          else if (lose === t) { li2.className = 'you'; li2.textContent = 'You lose to ' + M.teams[win]; }
+          else li2.textContent = M.teams[win] + ' beats ' + M.teams[lose];
+          ul.append(li2);
+        });
+        row.append(w, ul); li.append(row);
+      }
+      if (!s.conds.length) {
+        const any = document.createElement('span'); any.className = 'any'; any.textContent = 'Just your picks. Everything else can go either way.'; li.append(any);
+      } else if (!picked && !s.conds.some((c) => M.games[c.k].a === t || M.games[c.k].b === t)) {
+        const any = document.createElement('span'); any.className = 'any'; any.textContent = 'Your own games can go either way.'; li.append(any);
+      }
+      ol.append(li);
+    });
+    el.replaceChildren(lead, ol);
+  });
+
+  dash.draw('projLeague', (el) => {
+    const { M, R } = projState();
+    if (M.status !== 'ok') { say(el, projMsg(M)); return; }
+    const rows = M.teams.map((name, t) => {
+      const mine = myGames(M, t), ew = d3.sum(mine, (x) => (x.a === t ? x.p : 1 - x.p)), wins = M.W[t] - M.T[t] / 2;
+      const odds = R && !R.error ? R.odds[t] : null;
+      return {
+        name, t, seed: M.seedOf.get(name) || 99, rec: recStr(wins, M.L[t], M.T[t]), ew: wins + ew, left: mine.length,
+        po: odds ? d3.sum(odds.slice(1, M.playoffTeams + 1)) : null,
+        likely: odds ? d3.maxIndex(odds) : null, best: odds ? R.best[t] : null, worst: odds ? R.worst[t] : null,
+      };
+    }).sort((a, b) => a.seed - b.seed || b.ew - a.ew);
+    const tbl = document.createElement('table'); tbl.className = 'rb-t'; tbl.setAttribute('data-source', 'schedule'); tbl.setAttribute('data-row-key', 'manager');
+    const hr = document.createElement('tr');
+    [['Seed', 'num'], ['Manager'], ['Record', 'num'], ['Proj. wins', 'num'], ['Playoff odds', 'num'], ['Most likely', 'num'], [R && R.exact ? 'Best / worst' : 'Best / worst seen', 'num']].forEach(([h, c]) => {
+      const th = document.createElement('th'); th.textContent = h; if (c) th.className = c; hr.append(th);
+    });
+    const thead = document.createElement('thead'); thead.append(hr);
+    const tb = document.createElement('tbody');
+    for (const r of rows) {
+      const tr = document.createElement('tr'); tr.setAttribute('data-key', encodeURIComponent(r.name)); if (r.name === pj.team) tr.className = 'me';
+      const td = (txt, cls) => { const c = document.createElement('td'); c.textContent = txt; if (cls) c.className = cls; tr.append(c); };
+      td(r.seed < 99 ? String(r.seed) : '—', 'num dim'); td(r.name); td(r.rec, 'num'); td(r.ew.toFixed(1), 'num');
+      td(r.po == null ? '…' : pct(r.po), 'num'); td(r.likely == null ? '…' : ord(r.likely), 'num');
+      td(r.best == null ? '…' : ord(r.best) + ' / ' + ord(r.worst), 'num dim');
+      tr.style.cursor = 'pointer'; tr.title = 'Show ' + r.name;
+      tr.onclick = () => { pj.team = r.name; pj.target = null; pj.picks = {}; redrawProj(); };
+      tb.append(tr);
+    }
+    const note = document.createElement('p'); note.className = 'rb-sub';
+    note.textContent = `${M.season} season, ${M.weeks.length} week${M.weeks.length === 1 ? '' : 's'} left (${M.games.length} games). Seed is where they stand today by the league's seeding rule. Tap a row to see that manager.`;
+    tbl.append(thead, tb); el.replaceChildren(tbl, note);
   });
 </script>
 

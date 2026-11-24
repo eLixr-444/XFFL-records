@@ -1,6 +1,7 @@
 # XFFL Record Book Bible - data refresh
 # Downloads every season of ESPN league 35342021 (public league API) and builds the
-# three data files the record book page reads: out/games.json, out/seasons.json, out/champions.json.
+# data files the record book page reads: out/games.json, out/seasons.json, out/champions.json,
+# and out/schedule.json (unplayed regular-season games of the season in progress, for the playoff projector).
 # Run:  python refresh.py
 # Completed seasons are cached in cache/ so they are not downloaded again.
 import json, os, sys, time, datetime, urllib.request, urllib.error
@@ -90,7 +91,7 @@ def main():
     if not S:
         sys.exit("No seasons downloaded - is ESPN reachable and the league still public?")
 
-    games, seasons, champs = [], [], []
+    games, seasons, champs, schedule = [], [], [], []
     current, current_week = None, 0
     for y, d in S.items():
         ss = d["settings"]["scheduleSettings"]
@@ -102,7 +103,15 @@ def main():
         bench = B[y]
         gl = []
         for m in d["schedule"]:
-            if "away" not in m or m.get("winner") in (None, "UNDECIDED"):
+            if "away" not in m:
+                continue
+            if m.get("winner") in (None, "UNDECIDED"):
+                p = m["matchupPeriodId"]
+                if not done and p <= reg:
+                    h, a = m["home"]["teamId"], m["away"]["teamId"]
+                    schedule.append(dict(id=f"{y}-w{p}-{m['id']}", season=y, week=p, home=own[h], home_team=tm[h]["name"].strip(),
+                                         away=own[a], away_team=tm[a]["name"].strip(), reg_weeks=reg, playoff_teams=pt,
+                                         seeding=ss.get("playoffSeedingRule", "H2H_RECORD")))
                 continue
             h, a, p = m["home"], m["away"], m["matchupPeriodId"]
             if p <= reg:
@@ -116,6 +125,7 @@ def main():
             g = dict(id=f"{y}-w{p}-{m['id']}", season=y, week=p, kind=kind,
                      home=own[h["teamId"]], home_team=tm[h["teamId"]]["name"].strip(), home_score=round(h["totalPoints"], 2),
                      away=own[a["teamId"]], away_team=tm[a["teamId"]]["name"].strip(), away_score=round(a["totalPoints"], 2),
+                     winner={"HOME": "home", "AWAY": "away"}.get(m["winner"], "tie"),
                      home_bench=bench.get(f"{p}-{h['teamId']}") if p <= reg else None,
                      away_bench=bench.get(f"{p}-{a['teamId']}") if p <= reg else None)
             games.append(g)
@@ -131,8 +141,19 @@ def main():
         for sc in weeks.values():
             for o, s in sc:
                 exp[o] = exp.get(o, 0) + sum(1 if s > s2 else .5 if s == s2 else 0 for o2, s2 in sc if o2 != o) / (len(sc) - 1)
+        # Records come from the games, with ESPN's winner deciding a tied score (its matchup tiebreaker is
+        # bench points), so a tied score never shows up as a tie in a record.
+        rec = {}
+        for g in gl:
+            if g["kind"] != "Regular season":
+                continue
+            for side, o in (("home", g["home"]), ("away", g["away"])):
+                c = rec.setdefault(o, [0, 0, 0])
+                c[0 if g["winner"] == side else 2 if g["winner"] == "tie" else 1] += 1
         for t in d["teams"]:
-            r, o, tc = t["record"]["overall"], own[t["id"]], t.get("transactionCounter", {})
+            r, o, tc = dict(t["record"]["overall"]), own[t["id"]], t.get("transactionCounter", {})
+            if o in rec:
+                r["wins"], r["losses"], r["ties"] = rec[o]
             gp = r["wins"] + r["losses"] + r["ties"]
             seasons.append(dict(
                 id=f"{y}-{o}", season=y, status="Complete" if done else "In progress", manager=o, team=t["name"].strip(),
@@ -159,9 +180,9 @@ def main():
         {"label": "Pulled", "value": f"{pulled}, {status}"},
         {"label": "refresh.py", "value": open(os.path.abspath(__file__)).read(), "type": "code", "lang": "python"},
     ]
-    for n, rows in (("games", games), ("seasons", seasons), ("champions", champs)):
+    for n, rows in (("games", games), ("seasons", seasons), ("champions", champs), ("schedule", schedule)):
         json.dump({"rows": rows, "meta": meta}, open(os.path.join(OUT, n + ".json"), "w"), separators=(",", ":"))
-    summary = {"pulled": pulled, "status": status, "games": len(games), "seasons": len(seasons), "champions": len(champs)}
+    summary = {"pulled": pulled, "status": status, "games": len(games), "scheduled": len(schedule), "seasons": len(seasons), "champions": len(champs)}
     json.dump(summary, open(os.path.join(OUT, "summary.json"), "w"))
     print(json.dumps(summary))
 
